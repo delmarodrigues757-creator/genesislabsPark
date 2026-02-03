@@ -3,62 +3,99 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DINO EMPIRE: MEGA EDITION</title>
+    <title>DINO EMPIRE: HARDCORE EDITION</title>
     <style>
         :root { 
-            --comum: #7f8c8d; --incomum: #2ecc71; --raro: #00d4ff; 
-            --epico: #a55eea; --lendario: #f1c40f; --hibrido: #ff00ff; --ceno: #00f2ff;
-            --n: #00d4ff; --bg: #02050a;
+            /* Cores de Raridade */
+            --comum: #95a5a6;    /* Cinza Concreto */
+            --incomum: #27ae60;  /* Verde Escuro */
+            --raro: #2980b9;     /* Azul Forte */
+            --super: #8e44ad;    /* Roxo Escuro */
+            --lendario: #f39c12; /* Ouro Queimado */
+            --hibrido: #e74c3c;  /* Vermelho Sangue */
+            --ceno: #00cec9;     /* Ciano Gelo */
+            
+            --n: #00d4ff; 
+            --bg: #0b0f19;
         }
-        * { box-sizing: border-box; font-family: 'Orbitron', sans-serif; user-select: none; outline:none; }
-        body { margin: 0; background: var(--bg); color: #fff; height: 100vh; overflow: hidden; touch-action: none; }
+        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select: none; outline:none; -webkit-tap-highlight-color: transparent; }
+        body { margin: 0; background: var(--bg); color: #ecf0f1; height: 100vh; overflow: hidden; touch-action: none; font-size: 12px; }
+
+        /* FONTE CUSTOMIZADA PARA TÍTULOS */
+        h1, h2, .v, .btn { font-family: 'Arial Black', sans-serif; letter-spacing: -0.5px; }
 
         /* HUD */
-        #hud { display: grid; grid-template-columns: repeat(4, 1fr); background: rgba(5, 10, 20, 0.95); padding: 15px; position: fixed; width: 100%; top: 0; z-index: 1000; border-bottom: 2px solid var(--n); }
-        .v { font-size: 13px; font-weight: 900; color: #fff; }
-        .l { font-size: 8px; color: var(--n); text-transform: uppercase; display: block; }
+        #hud { display: grid; grid-template-columns: repeat(4, 1fr); background: rgba(11, 15, 25, 0.95); padding: 10px; position: fixed; width: 100%; top: 0; z-index: 1000; border-bottom: 2px solid #333; box-shadow: 0 5px 20px rgba(0,0,0,0.8); }
+        .v { font-size: 12px; color: #fff; display: block; margin-top: 2px; }
+        .l { font-size: 9px; color: #7f8c8d; font-weight: bold; display: block; }
 
-        #btn-map-toggle { cursor:pointer; text-align:center; border-radius:8px; border:1px solid var(--n); transition: 0.3s; }
-        .active-ceno { border-color: var(--ceno) !important; background: rgba(0, 242, 255, 0.2); box-shadow: 0 0 10px var(--ceno); }
+        #btn-map-toggle { cursor:pointer; text-align:center; border-radius:4px; background: rgba(255,255,255,0.05); padding: 2px; }
 
+        /* MAPA */
         #viewport { width: 100vw; height: 100vh; position: relative; overflow: hidden; }
-        #map { position: absolute; width: 8000px; height: 8000px; transform-origin: 0 0; }
-        .map-normal { background-color: #02050a; background-image: linear-gradient(rgba(0, 212, 255, 0.05) 1.5px, transparent 1.5px), linear-gradient(90deg, rgba(0, 212, 255, 0.05) 1.5px, transparent 1.5px); background-size: 80px 80px; }
-        .map-ceno { background-color: #0d2533; background-image: radial-gradient(circle, #00f2ff22 1px, transparent 1px); background-size: 50px 50px; }
+        #map { position: absolute; width: 6000px; height: 6000px; transform-origin: 0 0; will-change: transform; }
         
-        .entity { position: absolute; transform: translate(-50%, -50%); z-index: 10; }
-        .cage { width: 110px; height: 110px; border: 3px solid #fff; border-radius: 25px; background: rgba(0,0,0,0.9); display: flex; align-items: center; justify-content: center; position: relative; }
-        .income-tag { position: absolute; bottom: -25px; background: #000; color: #2ecc71; padding: 2px 8px; border-radius: 5px; font-size: 10px; font-weight: 900; border: 1px solid #2ecc71; white-space: nowrap; }
-        .lvl-badge { position: absolute; top: -12px; background: #fff; color: #000; padding: 2px 10px; border-radius: 10px; font-size: 9px; font-weight: 900; border: 2px solid var(--n); }
+        .map-normal { background-color: #1a1a1a; background-image: radial-gradient(#333 1px, transparent 1px); background-size: 40px 40px; }
+        .map-ceno { background-color: #182C36; background-image: radial-gradient(#607D8B 1px, transparent 1px); background-size: 40px 40px; }
+        
+        /* ENTIDADES */
+        .entity { position: absolute; transform: translate(-50%, -50%); z-index: 10; cursor: pointer; }
+        .entity:active { transform: translate(-50%, -50%) scale(0.95); }
+        
+        .cage { width: 80px; height: 80px; border: 2px solid #555; border-radius: 12px; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; position: relative; backdrop-filter: blur(4px); transition: border-color 0.3s; }
+        
+        .income-tag { position: absolute; bottom: -18px; background: #000; color: #2ecc71; padding: 2px 4px; border-radius: 3px; font-size: 8px; font-weight: bold; border: 1px solid #333; white-space: nowrap; }
+        .lvl-badge { position: absolute; top: -8px; background: #fff; color: #000; padding: 1px 6px; border-radius: 8px; font-size: 7px; font-weight: 900; border: 1px solid #000; }
+        .dino-emoji { font-size: 35px; filter: drop-shadow(0 4px 2px rgba(0,0,0,0.5)); }
 
-        .placement-guide { position: absolute; width: 150px; height: 150px; border: 3px dashed var(--n); border-radius: 50%; transform: translate(-50%, -50%); background: rgba(0, 212, 255, 0.1); pointer-events: none; z-index: 5; animation: pulse 1s infinite; }
-        @keyframes pulse { 0%, 100% { scale: 0.9; opacity: 0.3; } 50% { scale: 1.1; opacity: 0.7; } }
+        .placement-guide { position: absolute; width: 100px; height: 100px; border: 2px dashed #fff; border-radius: 50%; transform: translate(-50%, -50%); background: rgba(255,255,255,0.1); pointer-events: none; z-index: 5; }
 
-        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.96); padding: 20px; display: none; z-index: 5000; overflow-y: auto; }
-        .m-card { background: #0d1526; border: 2px solid var(--n); border-radius: 30px; padding: 20px; max-width: 500px; margin: auto; }
-        .btn { background: var(--n); color: #000; border: none; padding: 12px; border-radius: 12px; width: 100%; margin: 4px 0; font-weight: 900; cursor: pointer; text-transform: uppercase; font-size: 11px; transition: 0.2s; }
-        .btn:active { transform: scale(0.95); }
+        /* MODAIS */
+        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); padding: 20px; display: none; z-index: 5000; overflow-y: auto; }
+        .m-card { background: #2c3e50; border: 1px solid #444; border-radius: 12px; padding: 15px; max-width: 500px; margin: auto; box-shadow: 0 0 40px rgba(0,0,0,0.8); color: #ecf0f1; }
+        .m-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; }
+        h2 { margin: 0; font-size: 16px; color: var(--n); }
 
-        nav { position: fixed; bottom: 0; width: 100%; height: 85px; background: rgba(5, 10, 20, 0.98); border-top: 2px solid var(--n); display: flex; z-index: 1000; }
-        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 8px; }
-        .nav-item span { font-size: 22px; margin-bottom: 3px; }
+        .btn { background: #34495e; color: #fff; border: none; padding: 12px; border-radius: 6px; width: 100%; margin: 5px 0; font-weight: bold; cursor: pointer; text-transform: uppercase; font-size: 10px; transition: 0.2s; box-shadow: 0 3px 0 rgba(0,0,0,0.3); }
+        .btn:active { transform: translateY(3px); box-shadow: none; }
+        .btn-close { background: #c0392b; margin-top: 15px; }
 
-        #panel { position: fixed; bottom: 95px; left: 5%; width: 90%; background: #0d1526; border: 2px solid var(--n); border-radius: 25px; padding: 15px; display: none; z-index: 2000; }
-        #log { position: fixed; bottom: 95px; left: 10px; pointer-events: none; z-index: 4000; }
-        .log-msg { background: rgba(0,0,0,0.9); color: var(--n); padding: 8px 15px; border-radius: 8px; margin-top: 5px; font-size: 10px; border-left: 4px solid var(--n); animation: fO 4s forwards; }
+        /* DINOPEDIA / INDEX STYLES */
+        #idx-list { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; max-height: 50vh; overflow-y: auto; padding: 5px; }
+        .idx-card { background: rgba(0,0,0,0.3); border-radius: 8px; padding: 8px; display: flex; flex-direction: column; align-items: center; border: 1px solid #444; position: relative; min-height: 70px; justify-content: center; }
+        .idx-emoji { font-size: 24px; }
+        .idx-name { font-size: 7px; text-align: center; color: #bdc3c7; margin-top: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; width: 100%; }
+        
+        .idx-locked { opacity: 0.3; filter: grayscale(1); }
+        .idx-locked::after { content: "🔒"; position: absolute; font-size: 14px; }
 
-        .rar-comum { border-color: var(--comum); }
-        .rar-incomum { border-color: var(--incomum); }
+        /* INVENTORY */
+        .inv-row { display: flex; gap: 8px; margin-bottom: 8px; align-items: center; background: rgba(0,0,0,0.2); padding: 5px; border-radius: 6px; border-left: 3px solid #555; }
+        .btn-sell-inv { background: #c0392b !important; width: 60px !important; }
+
+        /* NAV & PANEL */
+        nav { position: fixed; bottom: 0; width: 100%; height: 70px; background: #151820; border-top: 1px solid #333; display: flex; z-index: 1000; padding-bottom: 10px; }
+        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 8px; color: #7f8c8d; cursor: pointer; }
+        .nav-item span { font-size: 20px; margin-bottom: 4px; }
+        .nav-item:active { background: #222; color: #fff; }
+
+        #panel { position: fixed; bottom: 80px; left: 5%; width: 90%; background: #2c3e50; border: 1px solid #fff; border-radius: 12px; padding: 15px; display: none; z-index: 2000; box-shadow: 0 0 50px #000; }
+        #log { position: fixed; bottom: 90px; left: 10px; pointer-events: none; z-index: 4000; width: 80%; }
+        .log-msg { background: rgba(0,0,0,0.8); color: #fff; padding: 4px 10px; border-radius: 4px; margin-top: 4px; font-size: 10px; border-left: 3px solid var(--n); animation: fadeOut 3s forwards; }
+
+        /* ESTILOS DE RARIDADE */
+        .rar-comum { border-color: var(--comum); box-shadow: 0 0 5px var(--comum); }
+        .rar-incomum { border-color: var(--incomum); box-shadow: 0 0 8px var(--incomum); }
         .rar-raro { border-color: var(--raro); box-shadow: 0 0 10px var(--raro); }
-        .rar-epico { border-color: var(--epico); box-shadow: 0 0 15px var(--epico); }
-        .rar-lendario { border-color: var(--lendario); box-shadow: 0 0 20px var(--lendario); }
-        .rar-hibrido { border-color: var(--hibrido); box-shadow: 0 0 20px var(--hibrido); }
+        .rar-super { border-color: var(--super); box-shadow: 0 0 15px var(--super); border-width: 3px; }
+        .rar-lendario { border-color: var(--lendario); box-shadow: 0 0 20px var(--lendario); border-width: 3px; animation: shine 2s infinite; }
+        .rar-hibrido { border-color: var(--hibrido); box-shadow: 0 0 25px var(--hibrido); }
+        .rar-ceno { border-color: var(--ceno); box-shadow: 0 0 10px var(--ceno); }
 
-        /* Estilo para lista de inventário com botão vender */
-        .inv-row { display: flex; gap: 5px; margin-bottom: 5px; align-items: stretch; }
-        .btn-sell-inv { background: #ff4757 !important; color: #fff !important; width: 80px !important; }
+        #btn-confirm { position:fixed; bottom:100px; left:50%; transform:translateX(-50%); width:200px; display:none; z-index:4000; background:#27ae60; border: 2px solid #fff; }
 
-        @keyframes fO { 0% { opacity: 1; } 100% { opacity: 0; transform: translateX(-30px); } }
+        @keyframes fadeOut { 0% { opacity: 1; } 80% { opacity: 1; } 100% { opacity: 0; transform: translateY(-10px); } }
+        @keyframes shine { 0% { box-shadow: 0 0 10px var(--lendario); } 50% { box-shadow: 0 0 25px var(--lendario); } 100% { box-shadow: 0 0 10px var(--lendario); } }
     </style>
 </head>
 <body>
@@ -66,11 +103,11 @@
 <div id="log"></div>
 
 <div id="hud">
-    <div><span class="l">CRÉDITOS</span><span id="v-cash" class="v">$0</span></div>
-    <div><span class="l">CARNE</span><span id="v-food" class="v">0</span></div>
-    <div><span class="l">CENO-DNA</span><span id="v-ceno" class="v">0</span></div>
+    <div><span class="l">DINHEIRO</span><span id="v-cash" class="v" style="color:#f1c40f">$0</span></div>
+    <div><span class="l">CARNE</span><span id="v-food" class="v" style="color:#e67e22">0</span></div>
+    <div><span class="l">C-DNA</span><span id="v-ceno" class="v" style="color:var(--ceno)">0</span></div>
     <div id="btn-map-toggle" onclick="switchWorld()">
-        <span class="l">MAPA</span><span id="v-world" class="v">NORMAL</span>
+        <span class="l">MAPA</span><span id="v-world" class="v">JURÁSSICO</span>
     </div>
 </div>
 
@@ -81,187 +118,541 @@
     </div>
 </div>
 
-<button id="btn-confirm" class="btn" style="position:fixed; bottom:100px; left:50%; transform:translateX(-50%); width:200px; display:none; z-index:4000; background:var(--incomum); border: 2px solid #fff" onclick="confirmPlacement()">SOLTAR AQUI ✅</button>
+<button id="btn-confirm" class="btn" onclick="confirmPlacement()">POSICIONAR ✅</button>
 
-<div id="modal-shop" class="modal"><div class="m-card"><h2>LOJA</h2><div style="display:grid; grid-template-columns:1fr 1fr; gap:8px"><button class="btn" onclick="buy('carn', 30000)">🥩 CARNÍVOROS<br>$30K</button><button class="btn" onclick="buy('herb', 20000)">🌿 HERBÍVOROS<br>$20K</button><button class="btn" onclick="buy('fly', 45000)">🦅 VOADORES<br>$45K</button><button class="btn" onclick="buy('wat', 70000)">🦈 AQUÁTICOS<br>$70K</button></div><button class="btn" style="background:var(--ceno); margin-top:10px; border:2px solid #fff" onclick="buy('ceno', 0)">🧬 USAR CENO-DNA (1)</button><button class="btn" style="background:#333; color:#fff" onclick="closeModals()">FECHAR</button></div></div>
+<div id="modal-shop" class="modal">
+    <div class="m-card">
+        <div class="m-header"><h2>MERCADO NEGRO</h2><span onclick="closeModals()">✖</span></div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px">
+            <button class="btn" onclick="buy('herb', 5000)">
+                🌿 PACOTE BÁSICO<br><span style="color:#aaa; font-size:9px">TIER 1 (Herb)</span><br>
+                <span style="color:#f1c40f">$5,000</span>
+            </button>
+            <button class="btn" onclick="buy('carn', 15000)">
+                🥩 PACOTE CAÇADOR<br><span style="color:#aaa; font-size:9px">TIER 2 (Carn)</span><br>
+                <span style="color:#f1c40f">$15,000</span>
+            </button>
+            <button class="btn" onclick="buy('fly', 45000)">
+                🦅 PACOTE AÉREO<br><span style="color:#aaa; font-size:9px">TIER 3 (Fly)</span><br>
+                <span style="color:#f1c40f">$45,000</span>
+            </button>
+            <button class="btn" onclick="buy('wat', 100000)">
+                🦈 PACOTE ABISSAL<br><span style="color:#aaa; font-size:9px">TIER 4 (Elite)</span><br>
+                <span style="color:#f1c40f">$100,000</span>
+            </button>
+        </div>
+        
+        <div style="background:rgba(0,0,0,0.3); padding:10px; margin-top:10px; border-radius:6px; font-size:9px; color:#aaa">
+            ℹ️ Pacotes mais caros têm chances muito maiores de conter dinossauros <b style="color:var(--super)">Super Raros</b> e <b style="color:var(--lendario)">Lendários</b>.
+        </div>
 
-<div id="modal-lab" class="modal"><div class="m-card"><h2>LABORATÓRIO</h2><div style="background:rgba(0,0,0,0.5); padding:10px; border-radius:15px; border-left:4px solid var(--hibrido); margin-bottom:10px"><b>INDOMINUS REX ($500K)</b><br><small>T-Rex Lvl 30 + Raptor Lvl 30</small></div><button class="btn" onclick="fuse('Indominus Rex')">🧬 FUNDIR INDOMINUS</button><div style="background:rgba(0,0,0,0.5); padding:10px; border-radius:15px; border-left:4px solid var(--hibrido); margin:10px 0"><b>INDORAPTOR ($1M)</b><br><small>Indominus Lvl 30 + Raptor Lvl 30</small></div><button class="btn" onclick="fuse('Indoraptor')">🧬 FUNDIR INDORAPTOR (OP)</button><button class="btn" style="background:#333" onclick="closeModals()">FECHAR</button></div></div>
+        <button class="btn" style="background:var(--ceno); margin-top:10px; color:#000" onclick="buy('ceno', 0)">
+            🧬 OVO CENOZÓICO (1 C-DNA)
+        </button>
+    </div>
+</div>
 
-<div id="modal-exp" class="modal"><div class="m-card"><h2>EXPEDIÇÃO GLOBAL</h2><div style="background:rgba(255,255,255,0.05); padding:15px; border-radius:15px; border: 1px solid var(--n)"><b>MISSÃO DE BUSCA</b><br><p>Custo: $75K | Tempo: 40s</p><button id="exp-btn" class="btn" onclick="startExp(40, 75000)">INICIAR</button></div><p id="exp-timer" style="text-align:center; color:var(--n); font-weight:900"></p><button class="btn" style="background:#333" onclick="closeModals()">FECHAR</button></div></div>
+<div id="modal-lab" class="modal">
+    <div class="m-card">
+        <div class="m-header"><h2>ENGENHARIA GENÉTICA</h2><span onclick="closeModals()">✖</span></div>
+        <p style="font-size:10px; color:#aaa; margin-bottom:10px">Funda dinossauros de nível 30+ para criar monstros.</p>
+        
+        <div style="border:1px solid var(--hibrido); padding:10px; border-radius:8px; margin-bottom:10px">
+            <b style="color:var(--hibrido)">INDOMINUS REX</b> <small style="float:right">$500K</small><br>
+            <span style="font-size:9px">T-Rex (Lvl 30) + Raptor (Lvl 30)</span>
+            <button class="btn" style="margin-top:5px; background:rgba(231, 76, 60, 0.3)" onclick="fuse('Indominus Rex')">FUNDIR</button>
+        </div>
+        
+        <div style="border:1px solid var(--hibrido); padding:10px; border-radius:8px">
+            <b style="color:var(--hibrido)">INDORAPTOR</b> <small style="float:right">$2M</small><br>
+            <span style="font-size:9px">Indominus (Lvl 30) + Raptor (Lvl 30)</span>
+            <button class="btn" style="margin-top:5px; background:rgba(231, 76, 60, 0.3)" onclick="fuse('Indoraptor')">FUNDIR</button>
+        </div>
+    </div>
+</div>
 
-<div id="modal-index" class="modal"><div class="m-card"><h2>DINOPÉDIA (100)</h2><div id="idx-list" style="display:grid; grid-template-columns:repeat(2,1fr); gap:6px"></div><button class="btn" onclick="closeModals()">FECHAR</button></div></div>
-<div id="modal-inv" class="modal"><div class="m-card"><h2>INVENTÁRIO</h2><div id="inv-grid"></div><button class="btn" onclick="closeModals()">FECHAR</button></div></div>
+<div id="modal-exp" class="modal">
+    <div class="m-card">
+        <div class="m-header"><h2>EXPEDIÇÃO ÁRTICA</h2><span onclick="closeModals()">✖</span></div>
+        <div style="text-align:center; padding:20px 0">
+            <div style="font-size:40px">🚁</div>
+            <p>Enviar equipe para recuperar DNA Congelado.</p>
+            <p style="color:var(--lendario); font-weight:bold">$75,000</p>
+            <button id="exp-btn" class="btn" style="background:#27ae60" onclick="startExp(60, 75000)">INICIAR (60s)</button>
+        </div>
+        <p id="exp-timer" style="text-align:center; font-weight:bold; color:#f39c12"></p>
+    </div>
+</div>
+
+<div id="modal-index" class="modal">
+    <div class="m-card">
+        <div class="m-header"><h2>DINOPÉDIA</h2><span onclick="closeModals()">✖</span></div>
+        <div id="idx-list"></div>
+        <button class="btn btn-close" onclick="closeModals()">FECHAR</button>
+    </div>
+</div>
+
+<div id="modal-inv" class="modal">
+    <div class="m-card">
+        <div class="m-header"><h2>INVENTÁRIO</h2><span onclick="closeModals()">✖</span></div>
+        <div id="inv-grid" style="max-height:300px; overflow-y:auto"></div>
+        <button class="btn btn-close" onclick="closeModals()">FECHAR</button>
+    </div>
+</div>
 
 <div id="panel">
-    <h2 id="p-name" style="margin:0"></h2>
-    <div id="p-stats" style="margin:10px 0; font-size:12px; color:#aaa"></div>
-    <button class="btn" onclick="upgradeDino()">🥩 ALIMENTAR ($<span id="p-up-cost"></span>)</button>
-    <button class="btn" style="background:#f1c40f" onclick="initMove()">🚚 MOVER</button>
-    <button class="btn" style="background:#e74c3c; color:#fff" onclick="sellDino()">VENDER</button>
-    <button class="btn" style="background:#333; color:#fff" onclick="closePanel()">VOLTAR</button>
+    <div style="display:flex; justify-content:space-between">
+        <h2 id="p-name" style="color:#fff"></h2>
+        <span id="p-rar" style="font-size:9px; padding:3px; border-radius:4px; height:fit-content"></span>
+    </div>
+    <div id="p-stats" style="margin:15px 0; font-size:11px; color:#bdc3c7; display:grid; grid-template-columns:1fr 1fr; gap:10px"></div>
+    <button class="btn" style="background:#e67e22" onclick="upgradeDino()">🥩 ALIMENTAR ($<span id="p-cost"></span>)</button>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:5px">
+        <button class="btn" style="background:#2980b9" onclick="initMove()">MOVER</button>
+        <button class="btn" style="background:#c0392b" onclick="sellDino()">VENDER</button>
+    </div>
+    <button class="btn" style="background:#34495e; margin-top:10px" onclick="closePanel()">VOLTAR</button>
 </div>
 
 <nav>
     <div class="nav-item" onclick="openModal('shop')"><span>🛒</span>LOJA</div>
-    <div class="nav-item" onclick="openModal('lab')"><span>🧪</span>LAB</div>
-    <div class="nav-item" onclick="openModal('exp')"><span>🗺️</span>EXPED</div>
-    <div class="nav-item" onclick="openModal('index')"><span>📖</span>INDEX</div>
-    <div class="nav-item" onclick="openModal('inv')"><span>🧬</span>INV</div>
-    <div class="nav-item" id="btn-food"><span>🥩</span>CARNE</div>
+    <div class="nav-item" onclick="openModal('lab')"><span>🧬</span>LAB</div>
+    <div class="nav-item" onclick="openModal('exp')"><span>🚁</span>EXPED</div>
+    <div class="nav-item" onclick="openIndex()"><span>📖</span>INDEX</div>
+    <div class="nav-item" onclick="openModal('inv')"><span>📦</span>INV</div>
+    <div class="nav-item" id="btn-food"><span>🥩</span>FARM</div>
 </nav>
 
 <script>
-function abb(n) {
-    if(n >= 1e9) return (n/1e9).toFixed(1).replace(/\.0$/,'')+'B';
-    if(n >= 1e6) return (n/1e6).toFixed(1).replace(/\.0$/,'')+'M';
-    if(n >= 1e3) return (n/1e3).toFixed(1).replace(/\.0$/,'')+'K';
-    return Math.floor(n).toString();
-}
-
+/* --- CONFIGURAÇÃO E DADOS --- */
 const DATA = {
-    carn: [{n:"Tyrannosaurus Rex", e:"🦖"}, {n:"Velociraptor", e:"🦎"}, {n:"Spinosaurus", e:"🐊"}],
-    herb: [{n:"Triceratops", e:"🚜"}, {n:"Brachiosaurus", e:"🦕"}, {n:"Stegosaurus", e:"🛡️"}],
-    fly: [{n:"Pteranodon", e:"🦅"}, {n:"Quetzalcoatlus", e:"✈️"}],
-    wat: [{n:"Mosasaurus", e:"🦈"}, {n:"Plesiosaurus", e:"🐍"}],
-    ceno: [{n:"Tigre Dente de Sabre", e:"🐅"}, {n:"Mammuthus", e:"🦣"}],
-    hibrido: [{n:"Indominus Rex", e:"🧬"}, {n:"Indoraptor", e:"🖤"}]
+    carn: [
+        {n:"Compy", e:"🦎"}, {n:"Dilopho", e:"🐍"}, {n:"Raptor", e:"🦖"}, 
+        {n:"Carnotauro", e:"🐂"}, {n:"Allosaurus", e:"🐊"}, {n:"T-Rex", e:"🦖"}, {n:"Spino", e:"🦈"}, {n:"Giga", e:"🐲"}
+    ],
+    herb: [
+        {n:"Galli", e:"🦤"}, {n:"Pachy", e:"🐐"}, {n:"Para", e:"🎷"}, 
+        {n:"Ankylo", e:"🐢"}, {n:"Stego", e:"🛡️"}, {n:"Trike", e:"🚜"}, {n:"Brachio", e:"🦕"}, {n:"Titan", e:"🏚️"}
+    ],
+    fly: [
+        {n:"Dimorph", e:"🦇"}, {n:"Pteranodon", e:"🦅"}, {n:"Tapejara", e:"🦜"}, {n:"Quetzal", e:"✈️"}
+    ],
+    wat: [
+        {n:"Ichthyo", e:"🐟"}, {n:"Plesio", e:"🦕"}, {n:"Mosasaurus", e:"🦈"}, {n:"Megalodon", e:"🦷"}
+    ],
+    ceno: [
+        {n:"Dodo", e:"🦤"}, {n:"Smilodon", e:"🐅"}, {n:"Mamute", e:"🦣"}, {n:"Preguiça", e:"🦥"}
+    ],
+    hibrido: [
+        {n:"Indominus Rex", e:"🧬"}, {n:"Indoraptor", e:"🌑"}
+    ]
 };
 
-let state = { cash: 100000, food: 100000, cenoDNA: 0, dinos: [], inv: [], discovered: [], expEnd: 0, world: 'normal', cam: {x:-3800, y:-3800} };
+const RARITY = {
+    comum: { color: '#95a5a6', name: 'COMUM', mult: 1 },
+    incomum: { color: '#27ae60', name: 'INCOMUM', mult: 1.5 },
+    raro: { color: '#2980b9', name: 'RARO', mult: 3 },
+    super: { color: '#8e44ad', name: 'SUPER', mult: 6 },
+    lendario: { color: '#f39c12', name: 'LENDÁRIO', mult: 15 },
+    hibrido: { color: '#e74c3c', name: 'HÍBRIDO', mult: 40 },
+    ceno: { color: '#00cec9', name: 'CENOZÓICO', mult: 8 }
+};
 
+/* --- ESTADO DO JOGO --- */
+let state = { 
+    cash: 6000, 
+    food: 1000, 
+    cenoDNA: 0, 
+    dinos: [], 
+    inv: [], 
+    discovered: [], 
+    expEnd: 0, 
+    world: 'normal', 
+    cam: {x:-2900, y:-2900} 
+};
+
+/* --- LOOP PRINCIPAL --- */
 function tick() {
-    let inc = 0;
+    let totalInc = 0;
     state.dinos.forEach(d => {
-        let b = (d.cat === 'ceno' || d.rar === 'hibrido') ? 1500 : 250;
-        let m = {comum:1, incomum:3, raro:10, epico:30, lendario:100, hibrido:400}[d.rar] || 1;
+        // Fórmula de renda: (Base * MultRaridade * Nivel) / Dificuldade
+        let base = (d.cat === 'ceno') ? 8 : 2;
+        let rMult = RARITY[d.rar].mult;
         
-        // DOBRO de lucro para o Indoraptor
-        if(d.name === "Indoraptor") m = 1600; 
-
-        let p = (d.lvl * b * m) / 10; inc += p; d.lastInc = p * 10;
+        // Curva logaritmica suave para levels altos não quebrarem o jogo
+        let income = (base * rMult * d.lvl) * 0.4;
+        
+        totalInc += income;
+        d.lastInc = income * 10; // $/s (o tick é 100ms)
     });
-    state.cash += inc;
 
+    state.cash += totalInc;
+
+    // Timer Expedição
     if(state.expEnd > Date.now()) {
-        document.getElementById('exp-timer').innerText = `Expedição: ${Math.ceil((state.expEnd - Date.now())/1000)}s`;
+        let s = Math.ceil((state.expEnd - Date.now())/1000);
+        document.getElementById('exp-timer').innerText = `${s}s`;
         document.getElementById('exp-btn').disabled = true;
+        document.getElementById('exp-btn').style.opacity = 0.5;
     } else {
         if(state.expEnd !== 0) finishExp();
         document.getElementById('exp-timer').innerText = "";
         document.getElementById('exp-btn').disabled = false;
+        document.getElementById('exp-btn').style.opacity = 1;
     }
 
+    updateHUD();
+}
+
+function updateHUD() {
     document.getElementById('v-cash').innerText = "$" + abb(state.cash);
     document.getElementById('v-food').innerText = abb(state.food);
     document.getElementById('v-ceno').innerText = state.cenoDNA;
-    updateLabels();
+    
+    // Atualiza apenas os textos visíveis
+    state.dinos.forEach((d, i) => {
+        if(d.world !== state.world) return;
+        const el = document.getElementById(`inc-${i}`);
+        if(el) el.innerText = `+$${abb(d.lastInc)}/s`;
+    });
 }
 
-function switchWorld() {
-    state.world = state.world === 'normal' ? 'ceno' : 'normal';
-    document.getElementById('v-world').innerText = state.world.toUpperCase();
-    document.getElementById('map').className = 'map-' + state.world;
-    render();
-}
+/* --- LÓGICA DE GACHA (SISTEMA DE PACOTES) --- */
+function buy(cat, price) {
+    if(cat === 'ceno') {
+        if(state.cenoDNA < 1) return alert("Precisa de DNA Cenozóico!");
+        state.cenoDNA--;
+    } else {
+        if(state.cash < price) return alert("Dinheiro insuficiente!");
+        state.cash -= price;
+    }
 
-function buy(cat, p) {
-    if(cat === 'ceno' && state.cenoDNA < 1) return alert("DNA insuficiente!");
-    if(state.cash < p && cat !== 'ceno') return alert("Saldo insuficiente!");
-    if(cat === 'ceno') state.cenoDNA--; else state.cash -= p;
-    state.inv.push(generate(cat));
+    let dino = generateDino(cat);
+    state.inv.push(dino);
+    addLog(`📦 ${dino.name} (${RARITY[dino.rar].name}) adquirido!`);
     openModal('inv');
+    save();
 }
 
-function generate(cat, forced = null) {
+function generateDino(cat) {
     const pool = DATA[cat] || DATA.carn;
-    let obj = forced ? pool.find(x => x.n === forced) : pool[Math.floor(Math.random() * pool.length)];
-    let rar = forced ? 'hibrido' : (Math.random() > 0.9 ? 'lendario' : 'comum');
+    // Seleciona nome aleatório da lista
+    let obj = pool[Math.floor(Math.random() * pool.length)];
+    
+    // Sorteio de Raridade baseado no Pacote (Category)
+    let rnd = Math.random() * 100;
+    let rar = 'comum';
+
+    if(cat === 'ceno') rar = 'ceno';
+    else if(cat === 'herb') { // Tier 1 (Pior chance)
+        if(rnd < 70) rar = 'comum';
+        else if(rnd < 95) rar = 'incomum';
+        else if(rnd < 99) rar = 'raro';
+        else rar = 'super';
+    } 
+    else if(cat === 'carn') { // Tier 2
+        if(rnd < 50) rar = 'comum';
+        else if(rnd < 80) rar = 'incomum';
+        else if(rnd < 95) rar = 'raro';
+        else if(rnd < 99) rar = 'super';
+        else rar = 'lendario';
+    }
+    else if(cat === 'fly') { // Tier 3
+        if(rnd < 30) rar = 'comum';
+        else if(rnd < 60) rar = 'incomum';
+        else if(rnd < 85) rar = 'raro';
+        else if(rnd < 97) rar = 'super';
+        else rar = 'lendario';
+    }
+    else if(cat === 'wat') { // Tier 4 (Melhor chance)
+        if(rnd < 10) rar = 'comum';
+        else if(rnd < 30) rar = 'incomum';
+        else if(rnd < 70) rar = 'raro';
+        else if(rnd < 90) rar = 'super';
+        else rar = 'lendario';
+    }
+
     if(!state.discovered.includes(obj.n)) state.discovered.push(obj.n);
-    return { name: obj.n, img: obj.e, cat, rar, lvl: 1, x:0, y:0, world: (cat==='ceno'?'ceno':'normal'), lastInc: 0 };
+
+    return {
+        name: obj.n, img: obj.e, cat: cat, rar: rar, lvl: 1, 
+        x:0, y:0, world: (cat==='ceno'?'ceno':'normal'), lastInc: 0
+    };
 }
 
+function fuse(type) {
+    let reqA = (type === "Indominus Rex") ? "T-Rex" : "Indominus Rex";
+    let reqB = (type === "Indominus Rex") ? "Raptor" : "Raptor";
+    let cost = (type === "Indominus Rex") ? 500000 : 2000000;
+
+    let idxA = state.dinos.findIndex(d => d.name === reqA && d.lvl >= 30);
+    let idxB = state.dinos.findIndex((d,i) => d.name === reqB && d.lvl >= 30 && i !== idxA);
+
+    if(idxA > -1 && idxB > -1 && state.cash >= cost) {
+        state.cash -= cost;
+        // Remove os 2 usados (do maior index pro menor pra nao bugar)
+        let rms = [idxA, idxB].sort((a,b)=>b-a);
+        state.dinos.splice(rms[0], 1);
+        state.dinos.splice(rms[1], 1);
+
+        let hibrido = {
+            name: type, img: (type==="Indominus Rex"?"🧬":"🌑"), 
+            cat: 'hibrido', rar: 'hibrido', lvl: 1, 
+            x:0, y:0, world: 'normal', lastInc: 0
+        };
+        state.inv.push(hibrido);
+        if(!state.discovered.includes(type)) state.discovered.push(type);
+        
+        addLog(`🧬 ${type} CRIADO COM SUCESSO!`);
+        closeModals();
+        openModal('inv');
+        render();
+        save();
+    } else {
+        alert(`Requisitos: ${reqA} (Lv30) + ${reqB} (Lv30) + $${abb(cost)}`);
+    }
+}
+
+/* --- INTERFACE E GESTÃO --- */
 function openModal(id) {
-    closeModals(); document.getElementById('modal-'+id).style.display = 'block';
+    document.querySelectorAll('.modal').forEach(m => m.style.display='none');
+    document.getElementById('modal-'+id).style.display = 'block';
+
     if(id === 'inv') {
-        const g = document.getElementById('inv-grid'); g.innerHTML = '';
+        const g = document.getElementById('inv-grid');
+        g.innerHTML = '';
+        if(state.inv.length === 0) g.innerHTML = "<p style='text-align:center;color:#777'>Vazio</p>";
+        
         state.inv.forEach((d, i) => {
-            const row = document.createElement('div');
-            row.className = 'inv-row';
+            let row = document.createElement('div');
+            row.className = 'inv-row rar-' + d.rar;
             row.innerHTML = `
-                <button class="btn" style="flex:1" onclick="startPlacement(${i})">${d.img} ${d.name}</button>
-                <button class="btn btn-sell-inv" onclick="sellInv(${i})">VENDER</button>
+                <div style="font-size:20px">${d.img}</div>
+                <div style="flex:1">
+                    <div style="font-weight:bold; color:${RARITY[d.rar].color}">${d.name}</div>
+                    <div style="font-size:8px; color:#aaa">${RARITY[d.rar].name}</div>
+                </div>
+                <button class="btn" style="width:auto; padding:5px 10px" onclick="startPlace(${i})">SOLTAR</button>
+                <button class="btn btn-sell-inv" onclick="sellInv(${i})">$${abb(500 * RARITY[d.rar].mult)}</button>
             `;
             g.appendChild(row);
         });
     }
 }
 
-function sellInv(i) {
-    state.cash += 15000;
-    state.inv.splice(i, 1);
-    openModal('inv');
-    addLog("💰 Dino vendido!");
+function openIndex() {
+    document.querySelectorAll('.modal').forEach(m => m.style.display='none');
+    document.getElementById('modal-index').style.display='block';
+    const l = document.getElementById('idx-list'); l.innerHTML = '';
+
+    ['carn','herb','fly','wat','ceno','hibrido'].forEach(cat => {
+        DATA[cat].forEach(d => {
+            let unlocked = state.discovered.includes(d.n);
+            let dDiv = document.createElement('div');
+            dDiv.className = unlocked ? 'idx-card' : 'idx-card idx-locked';
+            dDiv.innerHTML = `<div class="idx-emoji">${d.e}</div><div class="idx-name">${d.n}</div>`;
+            l.appendChild(dDiv);
+        });
+    });
 }
 
-function fuse(t) {
-    let d1_name = (t === "Indominus Rex") ? "Tyrannosaurus Rex" : "Indominus Rex";
-    let d2_name = "Velociraptor";
-    let cost = (t === "Indominus Rex") ? 500000 : 1000000;
+function sellInv(i) {
+    let d = state.inv[i];
+    let val = 500 * RARITY[d.rar].mult;
+    state.cash += val;
+    state.inv.splice(i, 1);
+    openModal('inv');
+}
 
-    let idx1 = state.dinos.findIndex(d => d.name === d1_name && d.lvl >= 30);
-    let idx2 = state.dinos.findIndex(d => d.name === d2_name && d.lvl >= 30);
+/* --- POSICIONAMENTO E MAPA --- */
+function startPlace(i) {
+    state.placing = state.inv.splice(i, 1)[0];
+    state.placing.x = Math.abs(state.cam.x) + (window.innerWidth/2);
+    state.placing.y = Math.abs(state.cam.y) + (window.innerHeight/2);
+    document.getElementById('btn-confirm').style.display='block';
+    closeModals();
+    render();
+}
 
-    if(idx1 !== -1 && idx2 !== -1 && state.cash >= cost) {
-        state.cash -= cost;
-        // Remove os dinos usados do mapa
-        let toRemove = [idx1, idx2].sort((a,b) => b - a);
-        state.dinos.splice(toRemove[0], 1);
-        state.dinos.splice(toRemove[1], 1);
-        
-        state.inv.push(generate('hibrido', t));
-        addLog("🧬 Híbrido criado com sucesso!");
-        closeModals();
-        render();
-        save();
+function confirmPlacement() {
+    if(!state.placing) return;
+    state.dinos.push(state.placing);
+    state.placing = null;
+    document.getElementById('btn-confirm').style.display='none';
+    render();
+    save();
+}
+
+function render() {
+    const layer = document.getElementById('entities-layer');
+    layer.innerHTML = '';
+    
+    state.dinos.forEach((d, i) => {
+        if(d.world !== state.world) return;
+        let el = document.createElement('div');
+        el.className = 'entity';
+        el.style.left = d.x + 'px';
+        el.style.top = d.y + 'px';
+        el.onclick = () => openPanel(i);
+        el.innerHTML = `
+            <div class="cage rar-${d.rar}">
+                <div class="lvl-badge">${d.lvl}</div>
+                <div class="dino-emoji">${d.img}</div>
+                <div class="income-tag" id="inc-${i}">...</div>
+            </div>
+        `;
+        layer.appendChild(el);
+    });
+
+    const pi = document.getElementById('placement-indicator');
+    if(state.placing) {
+        pi.style.display = 'block';
+        pi.style.left = state.placing.x + 'px';
+        pi.style.top = state.placing.y + 'px';
     } else {
-        alert("Precisa dos dois dinos Lvl 30 no MAPA e créditos!");
+        pi.style.display = 'none';
     }
 }
 
-function startPlacement(i) { state.placing = state.inv.splice(i, 1)[0]; state.placing.x = Math.abs(state.cam.x)+200; state.placing.y = Math.abs(state.cam.y)+200; document.getElementById('btn-confirm').style.display='block'; closeModals(); render(); }
-function confirmPlacement() { state.dinos.push(state.placing); state.placing = null; document.getElementById('btn-confirm').style.display='none'; render(); save(); }
-function openPanel(i) { state.selected = i; let d = state.dinos[i]; document.getElementById('panel').style.display = 'block'; document.getElementById('p-name').innerText = d.name; document.getElementById('p-up-cost').innerText = abb(d.lvl * 50000); }
-function upgradeDino() { let d = state.dinos[state.selected]; let cost = d.lvl * 50000; if(state.food >= cost) { state.food -= cost; d.lvl++; openPanel(state.selected); render(); } }
-function sellDino() { state.cash += 50000; state.dinos.splice(state.selected, 1); closePanel(); render(); save(); }
-function closeModals() { document.querySelectorAll('.modal').forEach(m => m.style.display='none'); }
-function closePanel() { document.getElementById('panel').style.display='none'; }
-function addLog(t) { const l = document.getElementById('log'); const d = document.createElement('div'); d.className = 'log-msg'; d.innerText = t; l.prepend(d); setTimeout(()=>d.remove(), 4000); }
-function updateLabels() { state.dinos.forEach((d, i) => { const t = document.getElementById(`inc-${i}`); if(t) t.innerText = `+$${abb(d.lastInc)}/s`; }); }
-function render() {
-    const layer = document.getElementById('entities-layer'); layer.innerHTML = '';
-    state.dinos.forEach((d, i) => {
-        if(d.world !== state.world) return;
-        const div = document.createElement('div'); div.className = 'entity'; div.style.left = d.x+'px'; div.style.top = d.y+'px';
-        div.onclick = () => openPanel(i);
-        div.innerHTML = `<div class="cage rar-${d.rar}"><div class="lvl-badge">LV. ${d.lvl}</div><div style="font-size:40px">${d.img}</div><div class="income-tag" id="inc-${i}">+$0/s</div></div>`;
-        layer.appendChild(div);
-    });
-    if(state.placing) { document.getElementById('placement-indicator').style.display = 'block'; document.getElementById('placement-indicator').style.left = state.placing.x+'px'; document.getElementById('placement-indicator').style.top = state.placing.y+'px'; }
-    else document.getElementById('placement-indicator').style.display = 'none';
-}
-function setupFood() { const b = document.getElementById('btn-food'); let t; b.onpointerdown = () => t = setInterval(() => { if(state.cash >= 2500){ state.cash -= 2500; state.food += 15000; } }, 70); b.onpointerup = () => clearInterval(t); }
-function save() { localStorage.setItem('DINO_SAVE', JSON.stringify(state)); }
-function load() { let r = localStorage.getItem('DINO_SAVE'); if(r) state = {...state, ...JSON.parse(r)}; }
-function startExp(t, c) { if(state.cash >= c) { state.cash -= c; state.expEnd = Date.now() + (t*1000); } }
-function finishExp() { state.expEnd = 0; state.cenoDNA++; addLog("📦 Expedição trouxe Ceno-DNA!"); save(); }
-function initMove() { state.placing = state.dinos.splice(state.selected, 1)[0]; document.getElementById('btn-confirm').style.display='block'; closePanel(); render(); }
+/* --- PAINEL E UPGRADES --- */
+function openPanel(i) {
+    state.selected = i;
+    let d = state.dinos[i];
+    let conf = RARITY[d.rar];
+    
+    document.getElementById('panel').style.display='block';
+    document.getElementById('p-name').innerText = d.name;
+    document.getElementById('p-rar').innerText = conf.name;
+    document.getElementById('p-rar').style.background = conf.color;
+    document.getElementById('p-rar').style.color = (d.rar==='comum' || d.rar==='lendario') ? '#000' : '#fff';
 
+    // Custo Exponencial: Base * (1.15 ^ Level)
+    let upCost = Math.floor(250 * conf.mult * Math.pow(1.15, d.lvl));
+    document.getElementById('p-cost').innerText = abb(upCost);
+
+    document.getElementById('p-stats').innerHTML = `
+        <div>Nível: <b style="color:#fff">${d.lvl}</b></div>
+        <div>Lucro: <b style="color:#2ecc71">$${abb(d.lastInc)}/s</b></div>
+    `;
+}
+
+function upgradeDino() {
+    let d = state.dinos[state.selected];
+    let conf = RARITY[d.rar];
+    let cost = Math.floor(250 * conf.mult * Math.pow(1.15, d.lvl));
+
+    if(state.food >= cost) {
+        state.food -= cost;
+        d.lvl++;
+        addLog("Nível aumentado! 🥩");
+        openPanel(state.selected);
+        save();
+    } else {
+        addLog("Carne insuficiente!");
+    }
+}
+
+function sellDino() {
+    let d = state.dinos[state.selected];
+    let val = Math.floor((d.lvl * 200 * RARITY[d.rar].mult));
+    if(confirm(`Vender por $${abb(val)}?`)) {
+        state.cash += val;
+        state.dinos.splice(state.selected, 1);
+        closePanel();
+        render();
+        save();
+    }
+}
+
+function initMove() {
+    state.placing = state.dinos.splice(state.selected, 1)[0];
+    document.getElementById('btn-confirm').style.display='block';
+    closePanel();
+    render();
+}
+
+/* --- MAPA DRAG --- */
 let isD = false, lx, ly;
-window.onpointerdown = (e) => { isD = true; lx = e.pageX; ly = e.pageY; };
-window.onpointermove = (e) => { if(!isD) return; let dx = e.pageX - lx; let dy = e.pageY - ly; if(state.placing) { state.placing.x += dx; state.placing.y += dy; render(); } else { state.cam.x += dx; state.cam.y += dy; document.getElementById('map').style.transform = `translate(${state.cam.x}px, ${state.cam.y}px)`; } lx = e.pageX; ly = e.pageY; };
+const map = document.getElementById('map');
+
+window.onpointerdown = (e) => {
+    if(!e.target.closest('.modal') && !e.target.closest('nav') && !e.target.closest('#hud') && !e.target.closest('#panel') && !e.target.closest('.btn')) {
+        isD = true; lx = e.pageX; ly = e.pageY;
+    }
+};
+window.onpointermove = (e) => {
+    if(!isD) return;
+    let dx = e.pageX - lx, dy = e.pageY - ly;
+    
+    if(state.placing) {
+        state.placing.x += dx; state.placing.y += dy; render();
+    } else {
+        state.cam.x += dx; state.cam.y += dy;
+        // Limites
+        if(state.cam.x > 0) state.cam.x = 0;
+        if(state.cam.y > 0) state.cam.y = 0;
+        if(state.cam.x < -5000) state.cam.x = -5000;
+        if(state.cam.y < -5000) state.cam.y = -5000;
+        map.style.transform = `translate(${state.cam.x}px, ${state.cam.y}px)`;
+    }
+    lx = e.pageX; ly = e.pageY;
+};
 window.onpointerup = () => isD = false;
 
-load(); setInterval(tick, 100); setupFood(); render();
+/* --- UTILITÁRIOS --- */
+function abb(n) {
+    if(n >= 1e9) return (n/1e9).toFixed(1)+'B';
+    if(n >= 1e6) return (n/1e6).toFixed(1)+'M';
+    if(n >= 1e3) return (n/1e3).toFixed(1)+'K';
+    return Math.floor(n);
+}
+function addLog(m) {
+    const l = document.getElementById('log');
+    const d = document.createElement('div');
+    d.className = 'log-msg'; d.innerText = m;
+    l.prepend(d);
+    if(l.children.length>5) l.lastChild.remove();
+    setTimeout(()=>d.remove(), 3000);
+}
+function switchWorld() {
+    state.world = (state.world==='normal')?'ceno':'normal';
+    document.getElementById('v-world').innerText = (state.world==='normal')?'JURÁSSICO':'CENOZÓICO';
+    document.getElementById('map').className = 'map-'+state.world;
+    render();
+    updateHUD();
+}
+function startExp(t, c) {
+    if(state.cash >= c) { state.cash -= c; state.expEnd = Date.now() + (t*1000); save(); }
+    else alert("Grana curta!");
+}
+function finishExp() { state.expEnd = 0; state.cenoDNA++; addLog("Expedição trouxe 1 DNA Cenozóico!"); save(); }
+function closeModals() { document.querySelectorAll('.modal').forEach(m => m.style.display='none'); }
+function closePanel() { document.getElementById('panel').style.display='none'; state.selected=null; }
+
+/* --- SAVE SYSTEM --- */
+function save() { localStorage.setItem('DINO_HARD_SAVE', JSON.stringify(state)); }
+function load() {
+    let d = localStorage.getItem('DINO_HARD_SAVE');
+    if(d) {
+        let l = JSON.parse(d);
+        state = {...state, ...l};
+        if(!state.discovered) state.discovered = [];
+    }
+}
+
+// Inicialização
+const btnF = document.getElementById('btn-food');
+let ft;
+btnF.onpointerdown = (e) => { e.preventDefault(); ft = setInterval(()=>{ if(state.cash>=20){state.cash-=20;state.food+=10;updateHUD();} }, 100); };
+btnF.onpointerup = () => clearInterval(ft);
+btnF.onpointerleave = () => clearInterval(ft);
+
+load();
+setInterval(tick, 100);
+setInterval(save, 10000);
+render();
+map.style.transform = `translate(${state.cam.x}px, ${state.cam.y}px)`;
+
 </script>
 </body>
 </html>
