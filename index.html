@@ -3,93 +3,100 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DINO EMPIRE: MEGA SAVE EDITION</title>
+    <title>DINO EMPIRE: MEGA EDITION</title>
     <style>
         :root { 
             --comum: #7f8c8d; --incomum: #2ecc71; --raro: #00d4ff; 
             --epico: #a55eea; --lendario: #f1c40f; --hibrido: #ff00ff; --ceno: #00f2ff;
             --n: #00d4ff; --bg: #02050a;
         }
-        * { box-sizing: border-box; font-family: 'Orbitron', sans-serif; user-select: none; }
+        * { box-sizing: border-box; font-family: 'Orbitron', sans-serif; user-select: none; outline:none; }
         body { margin: 0; background: var(--bg); color: #fff; height: 100vh; overflow: hidden; touch-action: none; }
 
+        /* HUD */
         #hud { display: grid; grid-template-columns: repeat(4, 1fr); background: rgba(5, 10, 20, 0.95); padding: 15px; position: fixed; width: 100%; top: 0; z-index: 1000; border-bottom: 2px solid var(--n); }
-        .v { font-size: 14px; font-weight: 900; color: #fff; }
-        .l { font-size: 9px; color: var(--n); text-transform: uppercase; letter-spacing: 1px; display: block; }
+        .v { font-size: 13px; font-weight: 900; color: #fff; }
+        .l { font-size: 8px; color: var(--n); text-transform: uppercase; display: block; }
 
+        /* BOTÃO MAPA */
+        #btn-map-toggle { cursor:pointer; text-align:center; border-radius:8px; border:1px solid var(--n); transition: 0.3s; }
+        .active-ceno { border-color: var(--ceno) !important; background: rgba(0, 242, 255, 0.2); box-shadow: 0 0 10px var(--ceno); }
+
+        /* MAPA */
         #viewport { width: 100vw; height: 100vh; position: relative; overflow: hidden; }
         #map { position: absolute; width: 8000px; height: 8000px; transform-origin: 0 0; }
         .map-normal { background-color: #02050a; background-image: linear-gradient(rgba(0, 212, 255, 0.05) 1.5px, transparent 1.5px), linear-gradient(90deg, rgba(0, 212, 255, 0.05) 1.5px, transparent 1.5px); background-size: 80px 80px; }
-        .map-ceno { background-color: #0d2533; background-image: radial-gradient(circle, #ffffff1a 1px, transparent 1px); background-size: 50px 50px; }
+        .map-ceno { background-color: #0d2533; background-image: radial-gradient(circle, #00f2ff22 1px, transparent 1px); background-size: 50px 50px; }
         
+        /* ENTIDADES */
         .entity { position: absolute; transform: translate(-50%, -50%); z-index: 10; }
-        .cage { width: 130px; height: 130px; border: 3px solid #fff; border-radius: 35px; background: rgba(0,0,0,0.9); display: flex; align-items: center; justify-content: center; position: relative; }
-        .dino-photo { font-size: 60px; }
-        .lvl-badge { position: absolute; top: -10px; background: #fff; color: #000; padding: 3px 12px; border-radius: 15px; font-size: 10px; font-weight: 900; border: 2px solid var(--n); }
+        .cage { width: 110px; height: 110px; border: 3px solid #fff; border-radius: 25px; background: rgba(0,0,0,0.9); display: flex; align-items: center; justify-content: center; position: relative; }
+        .income-tag { position: absolute; bottom: -25px; background: #000; color: #2ecc71; padding: 2px 8px; border-radius: 5px; font-size: 10px; font-weight: 900; border: 1px solid #2ecc71; white-space: nowrap; }
+        .lvl-badge { position: absolute; top: -12px; background: #fff; color: #000; padding: 2px 10px; border-radius: 10px; font-size: 9px; font-weight: 900; border: 2px solid var(--n); }
 
+        /* MIRA NEON */
+        .placement-guide { position: absolute; width: 150px; height: 150px; border: 3px dashed var(--n); border-radius: 50%; transform: translate(-50%, -50%); background: rgba(0, 212, 255, 0.1); pointer-events: none; z-index: 5; animation: pulse 1s infinite; }
+        @keyframes pulse { 0%, 100% { scale: 0.9; opacity: 0.3; } 50% { scale: 1.1; opacity: 0.7; } }
+
+        /* MODAIS */
+        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.96); padding: 20px; display: none; z-index: 5000; overflow-y: auto; }
+        .m-card { background: #0d1526; border: 2px solid var(--n); border-radius: 30px; padding: 20px; max-width: 500px; margin: auto; }
+        .btn { background: var(--n); color: #000; border: none; padding: 12px; border-radius: 12px; width: 100%; margin: 4px 0; font-weight: 900; cursor: pointer; text-transform: uppercase; font-size: 11px; }
+
+        nav { position: fixed; bottom: 0; width: 100%; height: 85px; background: rgba(5, 10, 20, 0.98); border-top: 2px solid var(--n); display: flex; z-index: 1000; }
+        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 8px; }
+        .nav-item span { font-size: 22px; margin-bottom: 3px; }
+
+        #panel { position: fixed; bottom: 95px; left: 5%; width: 90%; background: #0d1526; border: 2px solid var(--n); border-radius: 25px; padding: 15px; display: none; z-index: 2000; }
+        #log { position: fixed; bottom: 95px; left: 10px; pointer-events: none; z-index: 4000; }
+        .log-msg { background: rgba(0,0,0,0.9); color: var(--n); padding: 8px 15px; border-radius: 8px; margin-top: 5px; font-size: 10px; border-left: 4px solid var(--n); animation: fO 4s forwards; }
+
+        /* RARIDADES */
         .rar-comum { border-color: var(--comum); }
         .rar-incomum { border-color: var(--incomum); }
-        .rar-raro { border-color: var(--raro); box-shadow: 0 0 15px var(--raro); }
-        .rar-epico { border-color: var(--epico); box-shadow: 0 0 20px var(--epico); }
-        .rar-lendario { border-color: var(--lendario); box-shadow: 0 0 30px var(--lendario); animation: shine 1.5s infinite; }
-        .rar-hibrido { border-color: var(--hibrido); box-shadow: 0 0 30px var(--hibrido); animation: shine 1s infinite; }
-        @keyframes shine { 0%, 100% { filter: brightness(1); } 50% { filter: brightness(1.5); } }
+        .rar-raro { border-color: var(--raro); box-shadow: 0 0 10px var(--raro); }
+        .rar-epico { border-color: var(--epico); box-shadow: 0 0 15px var(--epico); }
+        .rar-lendario { border-color: var(--lendario); box-shadow: 0 0 20px var(--lendario); }
+        .rar-hibrido { border-color: var(--hibrido); box-shadow: 0 0 20px var(--hibrido); }
 
-        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.96); padding: 25px; display: none; z-index: 5000; overflow-y: auto; }
-        .m-card { background: #0d1526; border: 2px solid var(--n); border-radius: 40px; padding: 30px; max-width: 550px; margin: auto; }
-        .btn { background: var(--n); color: #000; border: none; padding: 15px; border-radius: 15px; width: 100%; margin: 5px 0; font-weight: 900; cursor: pointer; text-transform: uppercase; }
-
-        nav { position: fixed; bottom: 0; width: 100%; height: 90px; background: rgba(5, 10, 20, 0.95); border-top: 2px solid var(--n); display: flex; z-index: 1000; }
-        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 10px; }
-        .nav-item span { font-size: 30px; margin-bottom: 5px; }
-
-        #panel { position: fixed; bottom: 100px; left: 5%; width: 90%; background: #0d1526; border: 2px solid var(--n); border-radius: 30px; padding: 20px; display: none; z-index: 2000; }
-        #btn-teleport { position: fixed; right: 20px; top: 120px; background: var(--n); border: 2px solid #fff; border-radius: 50%; width: 60px; height: 60px; font-size: 30px; z-index: 1000; display: flex; align-items: center; justify-content: center; }
-        
-        .save-msg { position: fixed; top: 80px; left: 50%; transform: translateX(-50%); background: var(--incomum); color: #000; padding: 5px 15px; border-radius: 10px; font-size: 10px; display: none; z-index: 9999; }
+        @keyframes fO { 0% { opacity: 1; } 100% { opacity: 0; transform: translateX(-30px); } }
     </style>
 </head>
 <body>
 
-<div id="save-indicator" class="save-msg">Sincronizando Dados... ✅</div>
+<div id="log"></div>
 
 <div id="hud">
     <div><span class="l">CRÉDITOS</span><span id="v-cash" class="v">$0</span></div>
     <div><span class="l">CARNE</span><span id="v-food" class="v">0</span></div>
     <div><span class="l">CENO-DNA</span><span id="v-ceno" class="v">0</span></div>
-    <div onclick="switchWorld()" style="cursor:pointer; text-align:center; background:rgba(255,255,255,0.1); border-radius:10px; border: 1px solid var(--ceno)">
-        <span class="l">MUNDO</span><span id="v-world" class="v">NORMAL</span>
+    <div id="btn-map-toggle" onclick="switchWorld()">
+        <span class="l">MAPA</span><span id="v-world" class="v">NORMAL</span>
     </div>
 </div>
-
-<div id="btn-teleport" onclick="teleportToDinos()">🎯</div>
 
 <div id="viewport">
-    <div id="map" class="map-normal"><div id="entities-layer"></div></div>
-</div>
-
-<button id="btn-confirm" class="btn" style="position:fixed; bottom:110px; left:50%; transform:translateX(-50%); width:220px; display:none; z-index:4000; background:var(--incomum); border: 2px solid #fff" onclick="confirmPlacement()">SOLTAR AQUI ✅</button>
-
-<div id="modal-shop" class="modal"><div class="m-card"><h2 style="text-align:center; color:var(--n)">LOJA</h2><div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px"><button class="btn" onclick="buy('carn', 30000)">🥩 CARNÍVOROS</button><button class="btn" onclick="buy('herb', 20000)">🌿 HERBÍVOROS</button><button class="btn" onclick="buy('fly', 45000)">🦅 VOADORES</button><button class="btn" onclick="buy('wat', 70000)">🦈 AQUÁTICOS</button></div><button class="btn" style="background:var(--ceno); margin-top:15px" onclick="buy('ceno', 1)">❄️ OVO CENOZOICO (1 DNA)</button><button class="btn" style="background:#333; color:#fff" onclick="closeModals()">FECHAR</button></div></div>
-
-<div id="modal-inv" class="modal">
-    <div class="m-card">
-        <h2>INVENTÁRIO</h2>
-        <div id="inv-list"></div>
-        <hr style="border: 0; border-top: 1px solid #333; margin: 20px 0;">
-        <button class="btn" style="background:#555; color:#fff; font-size:10px" onclick="exportSave()">📋 COPIAR CÓDIGO DE RECUPERAÇÃO</button>
-        <button class="btn" style="background:#555; color:#fff; font-size:10px" onclick="importSave()">📥 IMPORTAR CÓDIGO</button>
-        <button class="btn" onclick="closeModals()">FECHAR</button>
+    <div id="map" class="map-normal">
+        <div id="placement-indicator" class="placement-guide" style="display:none"></div>
+        <div id="entities-layer"></div>
     </div>
 </div>
 
-<div id="modal-lab" class="modal"><div class="m-card"><h2>LABORATÓRIO</h2><button class="btn" style="background:var(--hibrido); color:#fff" onclick="fuse('Indominus Rex')">CRIAR INDOMINUS REX</button><button class="btn" style="background:var(--hibrido); color:#fff" onclick="fuse('Indoraptor')">CRIAR INDORAPTOR</button><button class="btn" style="background:#333; color:#fff" onclick="closeModals()">FECHAR</button></div></div>
-<div id="modal-index" class="modal"><div class="m-card"><h2>DINOPÉDIA</h2><div id="idx-grid" style="display:grid; gap:8px"></div><button class="btn" onclick="closeModals()">FECHAR</button></div></div>
+<button id="btn-confirm" class="btn" style="position:fixed; bottom:100px; left:50%; transform:translateX(-50%); width:200px; display:none; z-index:4000; background:var(--incomum); border: 2px solid #fff" onclick="confirmPlacement()">SOLTAR AQUI ✅</button>
+
+<div id="modal-shop" class="modal"><div class="m-card"><h2>LOJA</h2><div style="display:grid; grid-template-columns:1fr 1fr; gap:8px"><button class="btn" onclick="buy('carn', 30000)">🥩 CARNÍVOROS<br>$30K</button><button class="btn" onclick="buy('herb', 20000)">🌿 HERBÍVOROS<br>$20K</button><button class="btn" onclick="buy('fly', 45000)">🦅 VOADORES<br>$45K</button><button class="btn" onclick="buy('wat', 70000)">🦈 AQUÁTICOS<br>$70K</button></div><button class="btn" style="background:var(--ceno); margin-top:10px; border:2px solid #fff" onclick="buy('ceno', 0)">🧬 USAR CENO-DNA (1)</button><button class="btn" style="background:#333; color:#fff" onclick="closeModals()">FECHAR</button></div></div>
+
+<div id="modal-lab" class="modal"><div class="m-card"><h2>LABORATÓRIO</h2><div style="background:rgba(0,0,0,0.5); padding:10px; border-radius:15px; border-left:4px solid var(--hibrido); margin-bottom:10px"><b>INDOMINUS REX ($500K)</b><br><small>T-Rex Lvl 30 + Raptor Lvl 30</small></div><button class="btn" onclick="fuse('Indominus Rex')">🧬 FUNDIR INDOMINUS</button><div style="background:rgba(0,0,0,0.5); padding:10px; border-radius:15px; border-left:4px solid var(--hibrido); margin:10px 0"><b>INDORAPTOR ($1M)</b><br><small>Indominus Lvl 30 + Raptor Lvl 30</small></div><button class="btn" onclick="fuse('Indoraptor')">🧬 FUNDIR INDORAPTOR</button><button class="btn" style="background:#333" onclick="closeModals()">FECHAR</button></div></div>
+
+<div id="modal-exp" class="modal"><div class="m-card"><h2>EXPEDIÇÃO GLOBAL</h2><div style="background:rgba(255,255,255,0.05); padding:15px; border-radius:15px; border: 1px solid var(--n)"><b>MISSÃO DE BUSCA</b><br><p>Custo: $75K | Tempo: 40s</p><button id="exp-btn" class="btn" onclick="startExp(40, 75000)">INICIAR</button></div><p id="exp-timer" style="text-align:center; color:var(--n); font-weight:900"></p><button class="btn" style="background:#333" onclick="closeModals()">FECHAR</button></div></div>
+
+<div id="modal-index" class="modal"><div class="m-card"><h2>DINOPÉDIA (100)</h2><div id="idx-list" style="display:grid; grid-template-columns:repeat(2,1fr); gap:6px"></div><button class="btn" onclick="closeModals()">FECHAR</button></div></div>
+<div id="modal-inv" class="modal"><div class="m-card"><h2>INVENTÁRIO</h2><div id="inv-grid"></div><button class="btn" onclick="closeModals()">FECHAR</button></div></div>
 
 <div id="panel">
-    <h2 id="p-name"></h2>
-    <div id="p-stats"></div>
-    <button class="btn" onclick="upgradeDino()">🥩 ALIMENTAR ($<span id="p-up-cost">0</span>)</button>
+    <h2 id="p-name" style="margin:0"></h2>
+    <div id="p-stats" style="margin:10px 0; font-size:12px; color:#aaa"></div>
+    <button class="btn" onclick="upgradeDino()">🥩 ALIMENTAR ($<span id="p-up-cost"></span>)</button>
     <button class="btn" style="background:#f1c40f" onclick="initMove()">🚚 MOVER</button>
     <button class="btn" style="background:#e74c3c; color:#fff" onclick="sellDino()">VENDER</button>
     <button class="btn" style="background:#333; color:#fff" onclick="closePanel()">VOLTAR</button>
@@ -98,200 +105,158 @@
 <nav>
     <div class="nav-item" onclick="openModal('shop')"><span>🛒</span>LOJA</div>
     <div class="nav-item" onclick="openModal('lab')"><span>🧪</span>LAB</div>
+    <div class="nav-item" onclick="openModal('exp')"><span>🗺️</span>EXPED</div>
+    <div class="nav-item" onclick="openModal('index')"><span>📖</span>INDEX</div>
     <div class="nav-item" onclick="openModal('inv')"><span>🧬</span>INV</div>
-    <div class="nav-item" onclick="openIndex()"><span>📖</span>INDEX</div>
     <div class="nav-item" id="btn-food"><span>🥩</span>CARNE</div>
 </nav>
 
 <script>
-const SPECIES = {
-    carn: ["Tyrannosaurus Rex", "Velociraptor Mongoliensis", "Spinosaurus Aegyptiacus", "Allosaurus Fragilis", "Baryonyx Walkeri"],
-    herb: ["Triceratops Horridus", "Brachiosaurus Altithorax", "Stegosaurus Stenops", "Ankylosaurus Magniventris"],
-    fly: ["Pteranodon Longiceps", "Quetzalcoatlus Northropi"],
-    wat: ["Mosasaurus Hoffmannii", "Elasmosaurus Platyurus"],
-    ceno: ["Smilodon Fatalis", "Mammuthus Primigenius", "Megatherium Americanum"]
+function abb(n) {
+    if(n >= 1e9) return (n/1e9).toFixed(1).replace(/\.0$/,'')+'B';
+    if(n >= 1e6) return (n/1e6).toFixed(1).replace(/\.0$/,'')+'M';
+    if(n >= 1e3) return (n/1e3).toFixed(1).replace(/\.0$/,'')+'K';
+    return Math.floor(n).toString();
+}
+
+const DATA = {
+    carn: [{n:"Tyrannosaurus Rex", e:"🦖"}, {n:"Velociraptor", e:"🦎"}, {n:"Spinosaurus", e:"🐊"}, {n:"Giganotosaurus", e:"👹"}, {n:"Allosaurus", e:"🐲"}, {n:"Baryonyx", e:"🐉"}, {n:"Carnotaurus", e:"🐂"}, {n:"Dilophosaurus", e:"🐍"}, {n:"Ceratosaurus", e:"👺"}, {n:"Majungasaurus", e:"👽"}, {n:"Albertosaurus", e:"🐾"}, {n:"Utahraptor", e:"🦅"}, {n:"Acrocanthosaurus", e:"🌵"}, {n:"Compsognathus", e:"🐁"}, {n:"Metriacanthosaurus", e:"🦎"}, {n:"Herrerasaurus", e:"🦎"}, {n:"Troodon", e:"👁️"}, {n:"Yutyrannus", e:"❄️"}, {n:"Concavenator", e:"⛰️"}, {n:"Indosuchus", e:"🐊"}],
+    herb: [{n:"Triceratops", e:"🚜"}, {n:"Brachiosaurus", e:"🦕"}, {n:"Stegosaurus", e:"🛡️"}, {n:"Ankylosaurus", e:"🔨"}, {n:"Parasaurolophus", e:"🎺"}, {n:"Diplodocus", e:"🦒"}, {n:"Apatosaurus", e:"⛰️"}, {n:"Iguanodon", e:"👍"}, {n:"Pachycephalosaurus", e:"👊"}, {n:"Styracosaurus", e:"🦄"}, {n:"Gallimimus", e:"🏃"}, {n:"Therizinosaurus", e:"💅"}, {n:"Maiasaura", e:"👩"}, {n:"Corythosaurus", e:"🎭"}, {n:"Edmontosaurus", e:"🦆"}, {n:"Argentinosaurus", e:"🏢"}, {n:"Ouranosaurus", e:"🐪"}, {n:"Kentrosaurus", e:"📍"}, {n:"Pachyrhinosaurus", e:"👃"}, {n:"Microceratus", e:"🐜"}],
+    fly: [{n:"Pteranodon", e:"🦅"}, {n:"Quetzalcoatlus", e:"✈️"}, {n:"Dimorphodon", e:"🦇"}, {n:"Tapejara", e:"🛶"}, {n:"Cearadactylus", e:"🧤"}, {n:"Archaeopteryx", e:"🐦"}, {n:"Rhamphorhynchus", e:"🎣"}, {n:"Tupandactylus", e:"🎈"}, {n:"Pterodactylus", e:"🪁"}, {n:"Alanqa", e:"🏜️"}],
+    wat: [{n:"Mosasaurus", e:"🦈"}, {n:"Plesiosaurus", e:"🐍"}, {n:"Elasmosaurus", e:"🦒"}, {n:"Tylosaurus", e:"🐋"}, {n:"Kronosaurus", e:"🐊"}, {n:"Dunkleosteus", e:"🛡️"}, {n:"Basilosaurus", e:"🐉"}, {n:"Ichthyosaurus", e:"🐬"}, {n:"Megalodon", e:"🦷"}, {n:"Liopleurodon", e:"🐳"}],
+    ceno: [{n:"Tigre Dente de Sabre", e:"🐅"}, {n:"Mammuthus", e:"🦣"}, {n:"Gigantopitecos", e:"🦍"}, {n:"Megatherium", e:"🦥"}, {n:"Smilodon Populator", e:"🐱"}, {n:"Doedicurus", e:"⚽"}, {n:"Elasmotherium", e:"🦏"}, {n:"Procoptodon", e:"🦘"}, {n:"Andrewsarchus", e:"🐺"}, {n:"Entelodon", e:"🐗"}, {n:"Megaloceros", e:"🦌"}, {n:"Phorusrhacos", e:"🐦"}, {n:"Uintatherium", e:"🐘"}, {n:"Arctodus", e:"🐻"}, {n:"Thylacosmilus", e:"🐆"}, {n:"Basilosaurus Ceno", e:"🐳"}, {n:"Hyaenodon", e:"🐕"}, {n:"Deinotherium", e:"🐘"}, {n:"Sivatherium", e:"🦒"}, {n:"Diprotodon", e:"🐨"}, {n:"Macrauchenia", e:"🐘"}, {n:"Kelenken", e:"🦅"}, {n:"Titanoboa", e:"🐍"}, {n:"Gastornis", e:"🦆"}, {n:"Chalicotherium", e:"🦍"}],
+    hibrido: [{n:"Indominus Rex", e:"🧬"}, {n:"Indoraptor", e:"🖤"}, {n:"Stegoceratops", e:"🛡️"}, {n:"Spinoraptor", e:"🐊"}, {n:"Ankylodocus", e:"🔨"}, {n:"Koolasaurus", e:"🐸"}, {n:"Ostafrikasaurus", e:"👹"}, {n:"Priotrodon", e:"🐉"}, {n:"Suprannotitan", e:"🌋"}, {n:"Erliphosaurus", e:"🦢"}, {n:"Giganocephalus", e:"🐢"}, {n:"Pachyceratops", e:"👊"}, {n:"Metrialong", e:"🐍"}, {n:"Unayrhynchus", e:"🐦"}, {n:"Rajastega", e:"👑"}]
 };
 
-let state = {
-    cash: 50000, food: 100000, cenoDNA: 0,
-    dinos: [], inv: [], discovered: [],
-    cam: { x: -3800, y: -3800 },
-    world: 'normal', placing: null, selected: null
-};
-
-function init() {
-    load(); // Carrega o save assim que abre
-    setInterval(tick, 100);
-    setInterval(save, 30000); // Save automático de segurança a cada 30s
-    setupFood();
-    updateMap();
-    render();
-}
-
-// --- SISTEMA DE SAVE AVANÇADO ---
-function save() {
-    localStorage.setItem('DINO_EMPIRE_MEGA_SAVE', JSON.stringify(state));
-    showSaveMsg();
-}
-
-function load() {
-    const raw = localStorage.getItem('DINO_EMPIRE_MEGA_SAVE');
-    if (raw) {
-        try {
-            const data = JSON.parse(raw);
-            state = {...state, ...data}; // Une o padrão com o salvo
-            console.log("Jogo Carregado!");
-        } catch(e) { console.error("Erro ao carregar save."); }
-    }
-}
-
-function exportSave() {
-    const code = btoa(JSON.stringify(state)); // Transforma o save em um código secreto
-    navigator.clipboard.writeText(code);
-    alert("CÓDIGO COPIADO! Guarde este texto num local seguro. Se perder o jogo, é só importar este código.");
-}
-
-function importSave() {
-    const code = prompt("Cole o código de recuperação aqui:");
-    if (code) {
-        try {
-            state = JSON.parse(atob(code));
-            save();
-            location.reload(); // Reinicia para aplicar o save
-        } catch(e) { alert("Código inválido!"); }
-    }
-}
-
-function showSaveMsg() {
-    const msg = document.getElementById('save-indicator');
-    msg.style.display = 'block';
-    setTimeout(() => msg.style.display = 'none', 2000);
-}
-// --- FIM DO SISTEMA DE SAVE ---
+let state = { cash: 100000, food: 100000, cenoDNA: 0, dinos: [], inv: [], discovered: [], expEnd: 0, world: 'normal', cam: {x:-3800, y:-3800} };
 
 function tick() {
-    let income = 0;
+    let inc = 0;
     state.dinos.forEach(d => {
-        let base = (d.cat === 'ceno' || d.rar === 'hibrido') ? 600 : 80;
-        let mult = {comum:1, incomum:3, raro:7, epico:15, lendario:50, hibrido:160, cenozoico:110}[d.rar] || 1;
-        income += (d.lvl * base * mult) / 10;
+        let b = (d.cat === 'ceno' || d.rar === 'hibrido') ? 1500 : 250;
+        let m = {comum:1, incomum:3, raro:10, epico:30, lendario:100, hibrido:400}[d.rar] || 1;
+        let p = (d.lvl * b * m) / 10; inc += p; d.lastInc = p * 10;
     });
-    state.cash += income;
-    document.getElementById('v-cash').innerText = "$" + Math.floor(state.cash).toLocaleString();
-    document.getElementById('v-food').innerText = Math.floor(state.food).toLocaleString();
+    state.cash += inc;
+
+    if(state.expEnd > Date.now()) {
+        document.getElementById('exp-timer').innerText = `Equipe em missão: ${Math.ceil((state.expEnd - Date.now())/1000)}s`;
+        document.getElementById('exp-btn').disabled = true;
+    } else {
+        if(state.expEnd !== 0) finishExp();
+        document.getElementById('exp-timer').innerText = "";
+        document.getElementById('exp-btn').disabled = false;
+    }
+
+    document.getElementById('v-cash').innerText = "$" + abb(state.cash);
+    document.getElementById('v-food').innerText = abb(state.food);
     document.getElementById('v-ceno').innerText = state.cenoDNA;
-    if(Math.random() > 0.999) spawnBonus();
-}
-
-function spawnBonus() {
-    const x = 3000 + Math.random()*2000, y = 3000 + Math.random()*2000;
-    const div = document.createElement('div');
-    div.style = `position:absolute; left:${x}px; top:${y}px; font-size:45px; cursor:pointer; z-index:100; filter:drop-shadow(0 0 10px #00f2ff)`;
-    div.innerHTML = '❄️';
-    div.onclick = () => { div.remove(); state.cenoDNA++; save(); };
-    document.getElementById('map').appendChild(div);
-}
-
-function generate(cat, forced = null) {
-    const pool = SPECIES[cat];
-    let name = forced || pool[Math.floor(Math.random() * pool.length)];
-    const rTable = [{r:'comum', p:0.4}, {r:'incomum', p:0.7}, {r:'raro', p:0.9}, {r:'epico', p:0.97}, {r:'lendario', p:1.0}];
-    let rar = forced ? (forced.includes('Indo') ? 'hibrido' : 'cenozoico') : rTable.find(t => Math.random() < t.p).r;
-    let icons = { carn: "🦖", herb: "🦕", fly: "🦅", wat: "🦈", ceno: "🦣", hibrido: "🧬" };
-    if(!state.discovered.includes(name)) state.discovered.push(name);
-    return { name, cat, rar, lvl: 1, x:0, y:0, img: icons[cat] || "🦖", world: (cat === 'ceno' ? 'ceno' : 'normal') };
+    updateLabels();
 }
 
 function switchWorld() {
-    state.world = (state.world === 'normal' ? 'ceno' : 'normal');
-    document.getElementById('map').className = (state.world === 'normal' ? 'map-normal' : 'map-ceno');
-    document.getElementById('v-world').innerText = state.world.toUpperCase();
-    render();
-}
-
-function buy(cat, price) {
-    if(cat === 'ceno' && state.cenoDNA >= 1) { state.cenoDNA--; state.inv.push(generate('ceno')); save(); openModal('inv'); }
-    else if(state.cash >= price && cat !== 'ceno') { state.cash -= price; state.inv.push(generate(cat)); save(); openModal('inv'); }
-}
-
-function startPlacement(i) {
-    let item = state.inv[i];
-    if(item.cat === 'ceno' && state.world !== 'ceno') return alert("Use o Mapa Gelado!");
-    if(item.cat !== 'ceno' && state.world === 'ceno') return alert("Use o Mapa Normal!");
-    closeModals();
-    state.placing = state.inv.splice(i, 1)[0];
-    state.placing.x = Math.abs(state.cam.x) + (window.innerWidth/2);
-    state.placing.y = Math.abs(state.cam.y) + (window.innerHeight/2);
-    document.getElementById('btn-confirm').style.display = 'block';
-    render();
-}
-
-function confirmPlacement() {
-    state.dinos.push(state.placing);
-    state.placing = null;
-    document.getElementById('btn-confirm').style.display = 'none';
-    save(); // Salva ao colocar no mapa
-    render();
-}
-
-function render() {
-    const layer = document.getElementById('entities-layer');
-    layer.innerHTML = '';
-    state.dinos.forEach((d, i) => {
-        if(d.world !== state.world) return;
-        const div = document.createElement('div');
-        div.className = 'entity';
-        div.style.left = d.x+'px'; div.style.top = d.y+'px';
-        div.onclick = () => openPanel(i);
-        div.innerHTML = `<div class="cage rar-${d.rar}"><div class="lvl-badge">LV. ${d.lvl}</div><div class="dino-photo">${d.img}</div></div>`;
-        layer.appendChild(div);
-    });
-    if(state.placing) {
-        const p = document.createElement('div');
-        p.className = 'entity';
-        p.style.left = state.placing.x+'px'; p.style.top = state.placing.y+'px';
-        p.innerHTML = `<div class="cage rar-${state.placing.rar}" style="border-style:dashed; opacity:0.6">${state.placing.img}</div>`;
-        layer.appendChild(p);
+    const btn = document.getElementById('btn-map-toggle');
+    const label = document.getElementById('v-world');
+    if (state.world === 'normal') {
+        state.world = 'ceno'; label.innerText = "CENOZOICO"; btn.classList.add('active-ceno');
+        document.getElementById('map').className = 'map-ceno';
+    } else {
+        state.world = 'normal'; label.innerText = "NORMAL"; btn.classList.remove('active-ceno');
+        document.getElementById('map').className = 'map-normal';
     }
+    render();
+}
+
+function buy(cat, p) {
+    if(cat === 'ceno') {
+        if(state.cenoDNA >= 1) { state.cenoDNA--; state.inv.push(generate('ceno')); addLog("❄️ DNA Usado!"); openModal('inv'); }
+        else alert("Você precisa de Ceno-DNA!"); return;
+    }
+    if(state.cash >= p) { state.cash -= p; state.inv.push(generate(cat)); openModal('inv'); }
+}
+
+function startExp(t, c) { if(state.cash >= c) { state.cash -= c; state.expEnd = Date.now() + (t*1000); addLog("✈️ Avião decolou!"); } }
+
+function finishExp() {
+    state.expEnd = 0; let r = Math.random();
+    if(r < 0.05) { state.cenoDNA++; addLog("✨ RARO: Ceno-DNA Encontrado!"); }
+    else if(r < 0.25) { let a = 50000 + Math.random()*100000; state.food += a; addLog(`🥩 +${abb(a)} Carne!`); }
+    else if(r < 0.55) { let a = 200000 + Math.random()*300000; state.cash += a; addLog(`💰 +$${abb(a)} Créditos!`); }
+    else { state.inv.push(generate('carn')); addLog("🦴 Fóssil recuperado."); }
+    save();
+}
+
+function generate(cat, forced = null) {
+    const pool = DATA[cat];
+    let obj = forced ? pool.find(x => x.n === forced) : pool[Math.floor(Math.random() * pool.length)];
+    let rar = 'comum'; let r = Math.random();
+    if(cat === 'ceno') { if(r > 0.99) rar = 'lendario'; else if(r > 0.95) rar = 'epico'; else if(r > 0.85) rar = 'raro'; else if(r > 0.6) rar = 'incomum'; }
+    else if(!forced) { if(r > 0.98) rar = 'lendario'; else if(r > 0.9) rar = 'epico'; else if(r > 0.7) rar = 'raro'; else if(r > 0.4) rar = 'incomum'; }
+    else rar = 'hibrido';
+    if(!state.discovered.includes(obj.n)) state.discovered.push(obj.n);
+    return { name: obj.n, img: obj.e, cat, rar, lvl: 1, x:0, y:0, world: (cat==='ceno'?'ceno':'normal'), lastInc: 0 };
 }
 
 function openPanel(i) {
-    state.selected = i;
-    let d = state.dinos[i];
-    document.getElementById('panel').style.display = 'block';
-    document.getElementById('p-name').innerText = d.name;
-    document.getElementById('p-name').style.color = `var(--${d.rar})`;
-    document.getElementById('p-stats').innerHTML = `CATEGORIA: ${d.cat.toUpperCase()}<br>RARIDADE: ${d.rar.toUpperCase()}`;
-    document.getElementById('p-up-cost').innerText = (d.lvl * 35000).toLocaleString();
+    state.selected = i; let d = state.dinos[i]; document.getElementById('panel').style.display = 'block';
+    document.getElementById('p-name').innerText = d.name; document.getElementById('p-up-cost').innerText = abb(d.lvl * 50000);
+    document.getElementById('p-stats').innerText = `${d.rar.toUpperCase()} | Lucro: $${abb(d.lastInc)}/s`;
 }
 
-function upgradeDino() { 
-    let d = state.dinos[state.selected]; 
-    let c = d.lvl * 35000; 
-    if(state.food >= c){ state.food -= c; d.lvl++; save(); openPanel(state.selected); render(); }
+function upgradeDino() {
+    let d = state.dinos[state.selected]; let cost = d.lvl * 50000;
+    if(state.food >= cost) { state.food -= cost; d.lvl++; openPanel(state.selected); render(); addLog("⭐ Level UP!"); }
 }
 
-function sellDino() { state.cash += 50000; state.dinos.splice(state.selected, 1); save(); closePanel(); render(); }
-function initMove() { state.placing = state.dinos.splice(state.selected, 1)[0]; document.getElementById('btn-confirm').style.display='block'; closePanel(); render(); }
-
-function teleportToDinos() { 
-    let t = state.dinos.find(d => d.world === state.world); 
-    if(t) { state.cam.x = -t.x + (window.innerWidth/2); state.cam.y = -t.y + (window.innerHeight/2); updateMap(); } 
+function fuse(t) {
+    const r30 = state.dinos.some(d => d.name === "Velociraptor" && d.lvl >= 30);
+    const t30 = state.dinos.some(d => d.name === "Tyrannosaurus Rex" && d.lvl >= 30);
+    const i30 = state.dinos.some(d => d.name === "Indominus Rex" && d.lvl >= 30);
+    if(t==='Indominus Rex' && r30 && t30 && state.cash >= 5e5) { state.cash-=5e5; state.inv.push(generate('hibrido',t)); closeModals(); }
+    else if(t==='Indoraptor' && i30 && r30 && state.cash >= 1e6) { state.cash-=1e6; state.inv.push(generate('hibrido',t)); closeModals(); }
+    else alert("Requisitos: Nível 30 + Créditos.");
 }
 
-function updateMap() { document.getElementById('map').style.transform = `translate(${state.cam.x}px, ${state.cam.y}px)`; }
-function setupFood() { const b = document.getElementById('btn-food'); let t; b.onpointerdown = () => t = setInterval(() => { if(state.cash >= 20000){ state.cash -= 20000; state.food += 80000; } }, 100); b.onpointerup = () => { clearInterval(t); save(); }; }
-function openModal(id) { closeModals(); document.getElementById('modal-'+id).style.display = 'block'; if(id === 'inv'){ const l = document.getElementById('inv-list'); l.innerHTML = ''; state.inv.forEach((d, i) => l.innerHTML += `<button class="btn" style="border:1px solid var(--${d.rar})" onclick="startPlacement(${i})">${d.img} ${d.name}</button>`); }}
+function addLog(t) { const l = document.getElementById('log'); const d = document.createElement('div'); d.className = 'log-msg'; d.innerText = t; l.prepend(d); setTimeout(()=>d.remove(), 4000); }
 function closeModals() { document.querySelectorAll('.modal').forEach(m => m.style.display='none'); }
 function closePanel() { document.getElementById('panel').style.display='none'; }
-function openIndex() { openModal('index'); const g = document.getElementById('idx-grid'); g.innerHTML = ''; state.discovered.sort().forEach(n => g.innerHTML += `<div style="padding:10px; background:rgba(255,255,255,0.1); border-radius:10px">🦴 ${n}</div>`); }
+function updateLabels() { state.dinos.forEach((d, i) => { const t = document.getElementById(`inc-${i}`); if(t) t.innerText = `+$${abb(d.lastInc)}/s`; }); }
+
+function render() {
+    const layer = document.getElementById('entities-layer'); layer.innerHTML = '';
+    state.dinos.forEach((d, i) => {
+        if(d.world !== state.world) return;
+        const div = document.createElement('div'); div.className = 'entity'; div.style.left = d.x+'px'; div.style.top = d.y+'px';
+        div.onclick = () => openPanel(i);
+        div.innerHTML = `<div class="cage rar-${d.rar}"><div class="lvl-badge">LV. ${d.lvl}</div><div style="font-size:40px">${d.img}</div><div class="income-tag" id="inc-${i}">+$0/s</div></div>`;
+        layer.appendChild(div);
+    });
+    const ind = document.getElementById('placement-indicator');
+    if(state.placing) { ind.style.display = 'block'; ind.style.left = state.placing.x+'px'; ind.style.top = state.placing.y+'px'; }
+    else ind.style.display = 'none';
+}
+
+function openModal(id) {
+    closeModals(); document.getElementById('modal-'+id).style.display = 'block';
+    if(id === 'inv') { const g = document.getElementById('inv-grid'); g.innerHTML = ''; state.inv.forEach((d, i) => g.innerHTML += `<button class="btn" style="border-bottom:3px solid var(--${d.rar})" onclick="startPlacement(${i})">${d.img} ${d.name}</button>`); }
+    if(id === 'index') { const l = document.getElementById('idx-list'); l.innerHTML = ''; Object.values(DATA).flat().forEach(obj => { const f = state.discovered.includes(obj.n); l.innerHTML += `<div style="background:rgba(255,255,255,0.05); padding:5px; border-radius:8px; font-size:9px; ${f?'':'opacity:0.2'}">${f?obj.e:'?'} ${f?obj.n:'???'}</div>`; }); }
+}
+
+function startPlacement(i) { state.placing = state.inv.splice(i, 1)[0]; state.placing.x = Math.abs(state.cam.x)+window.innerWidth/2; state.placing.y = Math.abs(state.cam.y)+window.innerHeight/2; document.getElementById('btn-confirm').style.display='block'; closeModals(); render(); }
+function confirmPlacement() { state.dinos.push(state.placing); state.placing = null; document.getElementById('btn-confirm').style.display='none'; render(); save(); }
+function initMove() { state.placing = state.dinos.splice(state.selected, 1)[0]; document.getElementById('btn-confirm').style.display='block'; closePanel(); render(); }
+function sellDino() { state.cash += 50000; state.dinos.splice(state.selected, 1); closePanel(); render(); }
+function setupFood() { const b = document.getElementById('btn-food'); let t; b.onpointerdown = () => t = setInterval(() => { if(state.cash >= 2500){ state.cash -= 2500; state.food += 15000; } }, 70); b.onpointerup = () => clearInterval(t); }
+
+function save() { localStorage.setItem('DINO_FULL_SAVE', JSON.stringify(state)); }
+function load() { let r = localStorage.getItem('DINO_FULL_SAVE'); if(r) state = {...state, ...JSON.parse(r)}; }
 
 let isD = false, lx, ly;
 window.onpointerdown = (e) => { isD = true; lx = e.pageX; ly = e.pageY; };
-window.onpointermove = (e) => { if(!isD) return; let dx = e.pageX - lx; let dy = e.pageY - ly; if(state.placing){ state.placing.x += dx; state.placing.y += dy; render(); } else { state.cam.x += dx; state.cam.y += dy; updateMap(); } lx = e.pageX; ly = e.pageY; };
+window.onpointermove = (e) => { if(!isD) return; let dx = e.pageX - lx; let dy = e.pageY - ly; if(state.placing) { state.placing.x += dx; state.placing.y += dy; render(); } else { state.cam.x += dx; state.cam.y += dy; document.getElementById('map').style.transform = `translate(${state.cam.x}px, ${state.cam.y}px)`; } lx = e.pageX; ly = e.pageY; };
 window.onpointerup = () => isD = false;
 
-init();
+load(); setInterval(tick, 100); setupFood(); render();
 </script>
 </body>
 </html>
