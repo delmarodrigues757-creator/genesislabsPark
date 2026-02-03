@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DINO EMPIRE: PRECISION EDITION</title>
+    <title>DINO EMPIRE: MEGA SAVE EDITION</title>
     <style>
         :root { 
             --comum: #7f8c8d; --incomum: #2ecc71; --raro: #00d4ff; 
@@ -45,9 +45,13 @@
 
         #panel { position: fixed; bottom: 100px; left: 5%; width: 90%; background: #0d1526; border: 2px solid var(--n); border-radius: 30px; padding: 20px; display: none; z-index: 2000; }
         #btn-teleport { position: fixed; right: 20px; top: 120px; background: var(--n); border: 2px solid #fff; border-radius: 50%; width: 60px; height: 60px; font-size: 30px; z-index: 1000; display: flex; align-items: center; justify-content: center; }
+        
+        .save-msg { position: fixed; top: 80px; left: 50%; transform: translateX(-50%); background: var(--incomum); color: #000; padding: 5px 15px; border-radius: 10px; font-size: 10px; display: none; z-index: 9999; }
     </style>
 </head>
 <body>
+
+<div id="save-indicator" class="save-msg">Sincronizando Dados... ✅</div>
 
 <div id="hud">
     <div><span class="l">CRÉDITOS</span><span id="v-cash" class="v">$0</span></div>
@@ -66,37 +70,27 @@
 
 <button id="btn-confirm" class="btn" style="position:fixed; bottom:110px; left:50%; transform:translateX(-50%); width:220px; display:none; z-index:4000; background:var(--incomum); border: 2px solid #fff" onclick="confirmPlacement()">SOLTAR AQUI ✅</button>
 
-<div id="modal-shop" class="modal">
+<div id="modal-shop" class="modal"><div class="m-card"><h2 style="text-align:center; color:var(--n)">LOJA</h2><div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px"><button class="btn" onclick="buy('carn', 30000)">🥩 CARNÍVOROS</button><button class="btn" onclick="buy('herb', 20000)">🌿 HERBÍVOROS</button><button class="btn" onclick="buy('fly', 45000)">🦅 VOADORES</button><button class="btn" onclick="buy('wat', 70000)">🦈 AQUÁTICOS</button></div><button class="btn" style="background:var(--ceno); margin-top:15px" onclick="buy('ceno', 1)">❄️ OVO CENOZOICO (1 DNA)</button><button class="btn" style="background:#333; color:#fff" onclick="closeModals()">FECHAR</button></div></div>
+
+<div id="modal-inv" class="modal">
     <div class="m-card">
-        <h2 style="text-align:center; color:var(--n)">LOJA DE EMBRIÕES</h2>
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px">
-            <button class="btn" onclick="buy('carn', 30000)">🥩 CARNÍVOROS<br>$30k</button>
-            <button class="btn" onclick="buy('herb', 20000)">🌿 HERBÍVOROS<br>$20k</button>
-            <button class="btn" onclick="buy('fly', 45000)">🦅 VOADORES<br>$45k</button>
-            <button class="btn" onclick="buy('wat', 70000)">🦈 AQUÁTICOS<br>$70k</button>
-        </div>
-        <button class="btn" style="background:var(--ceno); color:#000; margin-top:15px" onclick="buy('ceno', 1)">❄️ OVO CENOZOICO (1 DNA)</button>
-        <button class="btn" style="background:#333; color:#fff" onclick="closeModals()">FECHAR</button>
+        <h2>INVENTÁRIO</h2>
+        <div id="inv-list"></div>
+        <hr style="border: 0; border-top: 1px solid #333; margin: 20px 0;">
+        <button class="btn" style="background:#555; color:#fff; font-size:10px" onclick="exportSave()">📋 COPIAR CÓDIGO DE RECUPERAÇÃO</button>
+        <button class="btn" style="background:#555; color:#fff; font-size:10px" onclick="importSave()">📥 IMPORTAR CÓDIGO</button>
+        <button class="btn" onclick="closeModals()">FECHAR</button>
     </div>
 </div>
 
-<div id="modal-lab" class="modal">
-    <div class="m-card">
-        <h2 style="text-align:center; color:var(--hibrido)">LABORATÓRIO</h2>
-        <button class="btn" style="background:var(--hibrido); color:#fff" onclick="fuse('Indominus Rex')">CRIAR INDOMINUS REX</button>
-        <button class="btn" style="background:var(--hibrido); color:#fff" onclick="fuse('Indoraptor')">CRIAR INDORAPTOR</button>
-        <button class="btn" style="background:#333; color:#fff" onclick="closeModals()">FECHAR</button>
-    </div>
-</div>
-
-<div id="modal-inv" class="modal"><div class="m-card"><h2>INVENTÁRIO</h2><div id="inv-list"></div><button class="btn" onclick="closeModals()">FECHAR</button></div></div>
+<div id="modal-lab" class="modal"><div class="m-card"><h2>LABORATÓRIO</h2><button class="btn" style="background:var(--hibrido); color:#fff" onclick="fuse('Indominus Rex')">CRIAR INDOMINUS REX</button><button class="btn" style="background:var(--hibrido); color:#fff" onclick="fuse('Indoraptor')">CRIAR INDORAPTOR</button><button class="btn" style="background:#333; color:#fff" onclick="closeModals()">FECHAR</button></div></div>
 <div id="modal-index" class="modal"><div class="m-card"><h2>DINOPÉDIA</h2><div id="idx-grid" style="display:grid; gap:8px"></div><button class="btn" onclick="closeModals()">FECHAR</button></div></div>
 
 <div id="panel">
     <h2 id="p-name"></h2>
     <div id="p-stats"></div>
     <button class="btn" onclick="upgradeDino()">🥩 ALIMENTAR ($<span id="p-up-cost">0</span>)</button>
-    <button class="btn" style="background:#f1c40f; color:#000" onclick="initMove()">🚚 MOVER</button>
+    <button class="btn" style="background:#f1c40f" onclick="initMove()">🚚 MOVER</button>
     <button class="btn" style="background:#e74c3c; color:#fff" onclick="sellDino()">VENDER</button>
     <button class="btn" style="background:#333; color:#fff" onclick="closePanel()">VOLTAR</button>
 </div>
@@ -110,13 +104,12 @@
 </nav>
 
 <script>
-// BANCO DE DADOS SEPARADO POR CATEGORIA
 const SPECIES = {
-    carn: ["Tyrannosaurus Rex", "Velociraptor Mongoliensis", "Spinosaurus Aegyptiacus", "Allosaurus Fragilis", "Baryonyx Walkeri", "Carnotaurus Sastrei", "Giganotosaurus Carolinii", "Albertosaurus Sarcophagus", "Majungasaurus Crenatissimus", "Dilophosaurus Wetherilli"],
-    herb: ["Triceratops Horridus", "Brachiosaurus Altithorax", "Stegosaurus Stenops", "Ankylosaurus Magniventris", "Parasaurolophus Walkeri", "Diplodocus Longus", "Iguanodon Bernissartensis", "Argentinosaurus Huanculensis", "Pachycephalosaurus Wyomingensis", "Therizinosaurus Cheloniformis"],
-    fly: ["Pteranodon Longiceps", "Quetzalcoatlus Northropi", "Dimorphodon Macronyx", "Tapejara Wellnhoferi", "Archaeopteryx Lithographica", "Microraptor Gui"],
-    wat: ["Mosasaurus Hoffmannii", "Elasmosaurus Platyurus", "Kronosaurus Queenslandicus", "Megalodon Chubutensis", "Basilosaurus Cetoides", "Pliosaurus Funkei"],
-    ceno: ["Smilodon Fatalis", "Mammuthus Primigenius", "Megatherium Americanum", "Glyptodon Clavipes", "Elasmotherium Sibiricum", "Coelodonta Antiquitatis", "Daeodon Shoshonensis"]
+    carn: ["Tyrannosaurus Rex", "Velociraptor Mongoliensis", "Spinosaurus Aegyptiacus", "Allosaurus Fragilis", "Baryonyx Walkeri"],
+    herb: ["Triceratops Horridus", "Brachiosaurus Altithorax", "Stegosaurus Stenops", "Ankylosaurus Magniventris"],
+    fly: ["Pteranodon Longiceps", "Quetzalcoatlus Northropi"],
+    wat: ["Mosasaurus Hoffmannii", "Elasmosaurus Platyurus"],
+    ceno: ["Smilodon Fatalis", "Mammuthus Primigenius", "Megatherium Americanum"]
 };
 
 let state = {
@@ -127,13 +120,54 @@ let state = {
 };
 
 function init() {
-    load();
+    load(); // Carrega o save assim que abre
     setInterval(tick, 100);
-    setInterval(save, 10000);
+    setInterval(save, 30000); // Save automático de segurança a cada 30s
     setupFood();
     updateMap();
     render();
 }
+
+// --- SISTEMA DE SAVE AVANÇADO ---
+function save() {
+    localStorage.setItem('DINO_EMPIRE_MEGA_SAVE', JSON.stringify(state));
+    showSaveMsg();
+}
+
+function load() {
+    const raw = localStorage.getItem('DINO_EMPIRE_MEGA_SAVE');
+    if (raw) {
+        try {
+            const data = JSON.parse(raw);
+            state = {...state, ...data}; // Une o padrão com o salvo
+            console.log("Jogo Carregado!");
+        } catch(e) { console.error("Erro ao carregar save."); }
+    }
+}
+
+function exportSave() {
+    const code = btoa(JSON.stringify(state)); // Transforma o save em um código secreto
+    navigator.clipboard.writeText(code);
+    alert("CÓDIGO COPIADO! Guarde este texto num local seguro. Se perder o jogo, é só importar este código.");
+}
+
+function importSave() {
+    const code = prompt("Cole o código de recuperação aqui:");
+    if (code) {
+        try {
+            state = JSON.parse(atob(code));
+            save();
+            location.reload(); // Reinicia para aplicar o save
+        } catch(e) { alert("Código inválido!"); }
+    }
+}
+
+function showSaveMsg() {
+    const msg = document.getElementById('save-indicator');
+    msg.style.display = 'block';
+    setTimeout(() => msg.style.display = 'none', 2000);
+}
+// --- FIM DO SISTEMA DE SAVE ---
 
 function tick() {
     let income = 0;
@@ -154,41 +188,36 @@ function spawnBonus() {
     const div = document.createElement('div');
     div.style = `position:absolute; left:${x}px; top:${y}px; font-size:45px; cursor:pointer; z-index:100; filter:drop-shadow(0 0 10px #00f2ff)`;
     div.innerHTML = '❄️';
-    div.onclick = () => { div.remove(); state.cenoDNA++; };
+    div.onclick = () => { div.remove(); state.cenoDNA++; save(); };
     document.getElementById('map').appendChild(div);
 }
 
 function generate(cat, forced = null) {
     const pool = SPECIES[cat];
     let name = forced || pool[Math.floor(Math.random() * pool.length)];
-    
     const rTable = [{r:'comum', p:0.4}, {r:'incomum', p:0.7}, {r:'raro', p:0.9}, {r:'epico', p:0.97}, {r:'lendario', p:1.0}];
     let rar = forced ? (forced.includes('Indo') ? 'hibrido' : 'cenozoico') : rTable.find(t => Math.random() < t.p).r;
-    
     let icons = { carn: "🦖", herb: "🦕", fly: "🦅", wat: "🦈", ceno: "🦣", hibrido: "🧬" };
     if(!state.discovered.includes(name)) state.discovered.push(name);
-    
     return { name, cat, rar, lvl: 1, x:0, y:0, img: icons[cat] || "🦖", world: (cat === 'ceno' ? 'ceno' : 'normal') };
 }
 
 function switchWorld() {
     state.world = (state.world === 'normal' ? 'ceno' : 'normal');
-    const m = document.getElementById('map');
-    m.className = (state.world === 'normal' ? 'map-normal' : 'map-ceno');
+    document.getElementById('map').className = (state.world === 'normal' ? 'map-normal' : 'map-ceno');
     document.getElementById('v-world').innerText = state.world.toUpperCase();
     render();
 }
 
 function buy(cat, price) {
-    if(cat === 'ceno' && state.cenoDNA >= 1) { state.cenoDNA--; state.inv.push(generate('ceno')); openModal('inv'); }
-    else if(state.cash >= price && cat !== 'ceno') { state.cash -= price; state.inv.push(generate(cat)); openModal('inv'); }
+    if(cat === 'ceno' && state.cenoDNA >= 1) { state.cenoDNA--; state.inv.push(generate('ceno')); save(); openModal('inv'); }
+    else if(state.cash >= price && cat !== 'ceno') { state.cash -= price; state.inv.push(generate(cat)); save(); openModal('inv'); }
 }
 
 function startPlacement(i) {
     let item = state.inv[i];
     if(item.cat === 'ceno' && state.world !== 'ceno') return alert("Use o Mapa Gelado!");
     if(item.cat !== 'ceno' && state.world === 'ceno') return alert("Use o Mapa Normal!");
-
     closeModals();
     state.placing = state.inv.splice(i, 1)[0];
     state.placing.x = Math.abs(state.cam.x) + (window.innerWidth/2);
@@ -201,6 +230,7 @@ function confirmPlacement() {
     state.dinos.push(state.placing);
     state.placing = null;
     document.getElementById('btn-confirm').style.display = 'none';
+    save(); // Salva ao colocar no mapa
     render();
 }
 
@@ -235,29 +265,26 @@ function openPanel(i) {
     document.getElementById('p-up-cost').innerText = (d.lvl * 35000).toLocaleString();
 }
 
-function fuse(type) {
-    let reqA = type.includes('Indominus') ? "Tyrannosaurus" : "Indominus";
-    let reqB = "Velociraptor";
-    let idxA = state.dinos.findIndex(d => d.name.includes(reqA) && d.lvl >= 30);
-    let idxB = state.dinos.findIndex(d => d.name.includes(reqB) && d.lvl >= 30);
-    if(idxA !== -1 && idxB !== -1) {
-        state.dinos.splice(Math.max(idxA, idxB), 1); state.dinos.splice(Math.min(idxA, idxB), 1);
-        state.inv.push(generate('hibrido', type)); alert("HÍBRIDO CRIADO!"); closeModals(); render();
-    } else alert("Requisitos: " + reqA + " e " + reqB + " no Nível 30!");
+function upgradeDino() { 
+    let d = state.dinos[state.selected]; 
+    let c = d.lvl * 35000; 
+    if(state.food >= c){ state.food -= c; d.lvl++; save(); openPanel(state.selected); render(); }
 }
 
-function upgradeDino() { let d = state.dinos[state.selected]; let c = d.lvl * 35000; if(state.food >= c){ state.food -= c; d.lvl++; openPanel(state.selected); render(); }}
+function sellDino() { state.cash += 50000; state.dinos.splice(state.selected, 1); save(); closePanel(); render(); }
 function initMove() { state.placing = state.dinos.splice(state.selected, 1)[0]; document.getElementById('btn-confirm').style.display='block'; closePanel(); render(); }
-function sellDino() { state.cash += 50000; state.dinos.splice(state.selected, 1); closePanel(); render(); }
-function teleportToDinos() { let t = state.dinos.find(d => d.world === state.world); if(t) { state.cam.x = -t.x + (window.innerWidth/2); state.cam.y = -t.y + (window.innerHeight/2); updateMap(); } }
-function openIndex() { openModal('index'); const g = document.getElementById('idx-grid'); g.innerHTML = ''; state.discovered.sort().forEach(n => g.innerHTML += `<div style="padding:10px; background:rgba(255,255,255,0.1); border-radius:10px">🦴 ${n}</div>`); }
+
+function teleportToDinos() { 
+    let t = state.dinos.find(d => d.world === state.world); 
+    if(t) { state.cam.x = -t.x + (window.innerWidth/2); state.cam.y = -t.y + (window.innerHeight/2); updateMap(); } 
+}
+
 function updateMap() { document.getElementById('map').style.transform = `translate(${state.cam.x}px, ${state.cam.y}px)`; }
-function setupFood() { const b = document.getElementById('btn-food'); let t; b.onpointerdown = () => t = setInterval(() => { if(state.cash >= 20000){ state.cash -= 20000; state.food += 80000; } }, 100); b.onpointerup = () => clearInterval(t); }
-function save() { localStorage.setItem('dino_v_final_prec', JSON.stringify(state)); }
-function load() { let s = localStorage.getItem('dino_v_final_prec'); if(s) state = {...state, ...JSON.parse(s)}; }
+function setupFood() { const b = document.getElementById('btn-food'); let t; b.onpointerdown = () => t = setInterval(() => { if(state.cash >= 20000){ state.cash -= 20000; state.food += 80000; } }, 100); b.onpointerup = () => { clearInterval(t); save(); }; }
 function openModal(id) { closeModals(); document.getElementById('modal-'+id).style.display = 'block'; if(id === 'inv'){ const l = document.getElementById('inv-list'); l.innerHTML = ''; state.inv.forEach((d, i) => l.innerHTML += `<button class="btn" style="border:1px solid var(--${d.rar})" onclick="startPlacement(${i})">${d.img} ${d.name}</button>`); }}
 function closeModals() { document.querySelectorAll('.modal').forEach(m => m.style.display='none'); }
 function closePanel() { document.getElementById('panel').style.display='none'; }
+function openIndex() { openModal('index'); const g = document.getElementById('idx-grid'); g.innerHTML = ''; state.discovered.sort().forEach(n => g.innerHTML += `<div style="padding:10px; background:rgba(255,255,255,0.1); border-radius:10px">🦴 ${n}</div>`); }
 
 let isD = false, lx, ly;
 window.onpointerdown = (e) => { isD = true; lx = e.pageX; ly = e.pageY; };
@@ -268,4 +295,3 @@ init();
 </script>
 </body>
 </html>
-
