@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>DINO EMPIRE: PRECISION EDITION</title>
+    <style>
+        :root { 
+            --comum: #7f8c8d; --incomum: #2ecc71; --raro: #00d4ff; 
+            --epico: #a55eea; --lendario: #f1c40f; --hibrido: #ff00ff; --ceno: #00f2ff;
+            --n: #00d4ff; --bg: #02050a;
+        }
+        * { box-sizing: border-box; font-family: 'Orbitron', sans-serif; user-select: none; }
+        body { margin: 0; background: var(--bg); color: #fff; height: 100vh; overflow: hidden; touch-action: none; }
+
+        #hud { display: grid; grid-template-columns: repeat(4, 1fr); background: rgba(5, 10, 20, 0.95); padding: 15px; position: fixed; width: 100%; top: 0; z-index: 1000; border-bottom: 2px solid var(--n); }
+        .v { font-size: 14px; font-weight: 900; color: #fff; }
+        .l { font-size: 9px; color: var(--n); text-transform: uppercase; letter-spacing: 1px; display: block; }
+
+        #viewport { width: 100vw; height: 100vh; position: relative; overflow: hidden; }
+        #map { position: absolute; width: 8000px; height: 8000px; transform-origin: 0 0; }
+        .map-normal { background-color: #02050a; background-image: linear-gradient(rgba(0, 212, 255, 0.05) 1.5px, transparent 1.5px), linear-gradient(90deg, rgba(0, 212, 255, 0.05) 1.5px, transparent 1.5px); background-size: 80px 80px; }
+        .map-ceno { background-color: #0d2533; background-image: radial-gradient(circle, #ffffff1a 1px, transparent 1px); background-size: 50px 50px; }
+        
+        .entity { position: absolute; transform: translate(-50%, -50%); z-index: 10; }
+        .cage { width: 130px; height: 130px; border: 3px solid #fff; border-radius: 35px; background: rgba(0,0,0,0.9); display: flex; align-items: center; justify-content: center; position: relative; }
+        .dino-photo { font-size: 60px; }
+        .lvl-badge { position: absolute; top: -10px; background: #fff; color: #000; padding: 3px 12px; border-radius: 15px; font-size: 10px; font-weight: 900; border: 2px solid var(--n); }
+
+        .rar-comum { border-color: var(--comum); }
+        .rar-incomum { border-color: var(--incomum); }
+        .rar-raro { border-color: var(--raro); box-shadow: 0 0 15px var(--raro); }
+        .rar-epico { border-color: var(--epico); box-shadow: 0 0 20px var(--epico); }
+        .rar-lendario { border-color: var(--lendario); box-shadow: 0 0 30px var(--lendario); animation: shine 1.5s infinite; }
+        .rar-hibrido { border-color: var(--hibrido); box-shadow: 0 0 30px var(--hibrido); animation: shine 1s infinite; }
+        @keyframes shine { 0%, 100% { filter: brightness(1); } 50% { filter: brightness(1.5); } }
+
+        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.96); padding: 25px; display: none; z-index: 5000; overflow-y: auto; }
+        .m-card { background: #0d1526; border: 2px solid var(--n); border-radius: 40px; padding: 30px; max-width: 550px; margin: auto; }
+        .btn { background: var(--n); color: #000; border: none; padding: 15px; border-radius: 15px; width: 100%; margin: 5px 0; font-weight: 900; cursor: pointer; text-transform: uppercase; }
+
+        nav { position: fixed; bottom: 0; width: 100%; height: 90px; background: rgba(5, 10, 20, 0.95); border-top: 2px solid var(--n); display: flex; z-index: 1000; }
+        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 10px; }
+        .nav-item span { font-size: 30px; margin-bottom: 5px; }
+
+        #panel { position: fixed; bottom: 100px; left: 5%; width: 90%; background: #0d1526; border: 2px solid var(--n); border-radius: 30px; padding: 20px; display: none; z-index: 2000; }
+        #btn-teleport { position: fixed; right: 20px; top: 120px; background: var(--n); border: 2px solid #fff; border-radius: 50%; width: 60px; height: 60px; font-size: 30px; z-index: 1000; display: flex; align-items: center; justify-content: center; }
+    </style>
+</head>
+<body>
+
+<div id="hud">
+    <div><span class="l">CRÉDITOS</span><span id="v-cash" class="v">$0</span></div>
+    <div><span class="l">CARNE</span><span id="v-food" class="v">0</span></div>
+    <div><span class="l">CENO-DNA</span><span id="v-ceno" class="v">0</span></div>
+    <div onclick="switchWorld()" style="cursor:pointer; text-align:center; background:rgba(255,255,255,0.1); border-radius:10px; border: 1px solid var(--ceno)">
+        <span class="l">MUNDO</span><span id="v-world" class="v">NORMAL</span>
+    </div>
+</div>
+
+<div id="btn-teleport" onclick="teleportToDinos()">🎯</div>
+
+<div id="viewport">
+    <div id="map" class="map-normal"><div id="entities-layer"></div></div>
+</div>
+
+<button id="btn-confirm" class="btn" style="position:fixed; bottom:110px; left:50%; transform:translateX(-50%); width:220px; display:none; z-index:4000; background:var(--incomum); border: 2px solid #fff" onclick="confirmPlacement()">SOLTAR AQUI ✅</button>
+
+<div id="modal-shop" class="modal">
+    <div class="m-card">
+        <h2 style="text-align:center; color:var(--n)">LOJA DE EMBRIÕES</h2>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px">
+            <button class="btn" onclick="buy('carn', 30000)">🥩 CARNÍVOROS<br>$30k</button>
+            <button class="btn" onclick="buy('herb', 20000)">🌿 HERBÍVOROS<br>$20k</button>
+            <button class="btn" onclick="buy('fly', 45000)">🦅 VOADORES<br>$45k</button>
+            <button class="btn" onclick="buy('wat', 70000)">🦈 AQUÁTICOS<br>$70k</button>
+        </div>
+        <button class="btn" style="background:var(--ceno); color:#000; margin-top:15px" onclick="buy('ceno', 1)">❄️ OVO CENOZOICO (1 DNA)</button>
+        <button class="btn" style="background:#333; color:#fff" onclick="closeModals()">FECHAR</button>
+    </div>
+</div>
+
+<div id="modal-lab" class="modal">
+    <div class="m-card">
+        <h2 style="text-align:center; color:var(--hibrido)">LABORATÓRIO</h2>
+        <button class="btn" style="background:var(--hibrido); color:#fff" onclick="fuse('Indominus Rex')">CRIAR INDOMINUS REX</button>
+        <button class="btn" style="background:var(--hibrido); color:#fff" onclick="fuse('Indoraptor')">CRIAR INDORAPTOR</button>
+        <button class="btn" style="background:#333; color:#fff" onclick="closeModals()">FECHAR</button>
+    </div>
+</div>
+
+<div id="modal-inv" class="modal"><div class="m-card"><h2>INVENTÁRIO</h2><div id="inv-list"></div><button class="btn" onclick="closeModals()">FECHAR</button></div></div>
+<div id="modal-index" class="modal"><div class="m-card"><h2>DINOPÉDIA</h2><div id="idx-grid" style="display:grid; gap:8px"></div><button class="btn" onclick="closeModals()">FECHAR</button></div></div>
+
+<div id="panel">
+    <h2 id="p-name"></h2>
+    <div id="p-stats"></div>
+    <button class="btn" onclick="upgradeDino()">🥩 ALIMENTAR ($<span id="p-up-cost">0</span>)</button>
+    <button class="btn" style="background:#f1c40f; color:#000" onclick="initMove()">🚚 MOVER</button>
+    <button class="btn" style="background:#e74c3c; color:#fff" onclick="sellDino()">VENDER</button>
+    <button class="btn" style="background:#333; color:#fff" onclick="closePanel()">VOLTAR</button>
+</div>
+
+<nav>
+    <div class="nav-item" onclick="openModal('shop')"><span>🛒</span>LOJA</div>
+    <div class="nav-item" onclick="openModal('lab')"><span>🧪</span>LAB</div>
+    <div class="nav-item" onclick="openModal('inv')"><span>🧬</span>INV</div>
+    <div class="nav-item" onclick="openIndex()"><span>📖</span>INDEX</div>
+    <div class="nav-item" id="btn-food"><span>🥩</span>CARNE</div>
+</nav>
+
+<script>
+// BANCO DE DADOS SEPARADO POR CATEGORIA
+const SPECIES = {
+    carn: ["Tyrannosaurus Rex", "Velociraptor Mongoliensis", "Spinosaurus Aegyptiacus", "Allosaurus Fragilis", "Baryonyx Walkeri", "Carnotaurus Sastrei", "Giganotosaurus Carolinii", "Albertosaurus Sarcophagus", "Majungasaurus Crenatissimus", "Dilophosaurus Wetherilli"],
+    herb: ["Triceratops Horridus", "Brachiosaurus Altithorax", "Stegosaurus Stenops", "Ankylosaurus Magniventris", "Parasaurolophus Walkeri", "Diplodocus Longus", "Iguanodon Bernissartensis", "Argentinosaurus Huanculensis", "Pachycephalosaurus Wyomingensis", "Therizinosaurus Cheloniformis"],
+    fly: ["Pteranodon Longiceps", "Quetzalcoatlus Northropi", "Dimorphodon Macronyx", "Tapejara Wellnhoferi", "Archaeopteryx Lithographica", "Microraptor Gui"],
+    wat: ["Mosasaurus Hoffmannii", "Elasmosaurus Platyurus", "Kronosaurus Queenslandicus", "Megalodon Chubutensis", "Basilosaurus Cetoides", "Pliosaurus Funkei"],
+    ceno: ["Smilodon Fatalis", "Mammuthus Primigenius", "Megatherium Americanum", "Glyptodon Clavipes", "Elasmotherium Sibiricum", "Coelodonta Antiquitatis", "Daeodon Shoshonensis"]
+};
+
+let state = {
+    cash: 50000, food: 100000, cenoDNA: 0,
+    dinos: [], inv: [], discovered: [],
+    cam: { x: -3800, y: -3800 },
+    world: 'normal', placing: null, selected: null
+};
+
+function init() {
+    load();
+    setInterval(tick, 100);
+    setInterval(save, 10000);
+    setupFood();
+    updateMap();
+    render();
+}
+
+function tick() {
+    let income = 0;
+    state.dinos.forEach(d => {
+        let base = (d.cat === 'ceno' || d.rar === 'hibrido') ? 600 : 80;
+        let mult = {comum:1, incomum:3, raro:7, epico:15, lendario:50, hibrido:160, cenozoico:110}[d.rar] || 1;
+        income += (d.lvl * base * mult) / 10;
+    });
+    state.cash += income;
+    document.getElementById('v-cash').innerText = "$" + Math.floor(state.cash).toLocaleString();
+    document.getElementById('v-food').innerText = Math.floor(state.food).toLocaleString();
+    document.getElementById('v-ceno').innerText = state.cenoDNA;
+    if(Math.random() > 0.999) spawnBonus();
+}
+
+function spawnBonus() {
+    const x = 3000 + Math.random()*2000, y = 3000 + Math.random()*2000;
+    const div = document.createElement('div');
+    div.style = `position:absolute; left:${x}px; top:${y}px; font-size:45px; cursor:pointer; z-index:100; filter:drop-shadow(0 0 10px #00f2ff)`;
+    div.innerHTML = '❄️';
+    div.onclick = () => { div.remove(); state.cenoDNA++; };
+    document.getElementById('map').appendChild(div);
+}
+
+function generate(cat, forced = null) {
+    const pool = SPECIES[cat];
+    let name = forced || pool[Math.floor(Math.random() * pool.length)];
+    
+    const rTable = [{r:'comum', p:0.4}, {r:'incomum', p:0.7}, {r:'raro', p:0.9}, {r:'epico', p:0.97}, {r:'lendario', p:1.0}];
+    let rar = forced ? (forced.includes('Indo') ? 'hibrido' : 'cenozoico') : rTable.find(t => Math.random() < t.p).r;
+    
+    let icons = { carn: "🦖", herb: "🦕", fly: "🦅", wat: "🦈", ceno: "🦣", hibrido: "🧬" };
+    if(!state.discovered.includes(name)) state.discovered.push(name);
+    
+    return { name, cat, rar, lvl: 1, x:0, y:0, img: icons[cat] || "🦖", world: (cat === 'ceno' ? 'ceno' : 'normal') };
+}
+
+function switchWorld() {
+    state.world = (state.world === 'normal' ? 'ceno' : 'normal');
+    const m = document.getElementById('map');
+    m.className = (state.world === 'normal' ? 'map-normal' : 'map-ceno');
+    document.getElementById('v-world').innerText = state.world.toUpperCase();
+    render();
+}
+
+function buy(cat, price) {
+    if(cat === 'ceno' && state.cenoDNA >= 1) { state.cenoDNA--; state.inv.push(generate('ceno')); openModal('inv'); }
+    else if(state.cash >= price && cat !== 'ceno') { state.cash -= price; state.inv.push(generate(cat)); openModal('inv'); }
+}
+
+function startPlacement(i) {
+    let item = state.inv[i];
+    if(item.cat === 'ceno' && state.world !== 'ceno') return alert("Use o Mapa Gelado!");
+    if(item.cat !== 'ceno' && state.world === 'ceno') return alert("Use o Mapa Normal!");
+
+    closeModals();
+    state.placing = state.inv.splice(i, 1)[0];
+    state.placing.x = Math.abs(state.cam.x) + (window.innerWidth/2);
+    state.placing.y = Math.abs(state.cam.y) + (window.innerHeight/2);
+    document.getElementById('btn-confirm').style.display = 'block';
+    render();
+}
+
+function confirmPlacement() {
+    state.dinos.push(state.placing);
+    state.placing = null;
+    document.getElementById('btn-confirm').style.display = 'none';
+    render();
+}
+
+function render() {
+    const layer = document.getElementById('entities-layer');
+    layer.innerHTML = '';
+    state.dinos.forEach((d, i) => {
+        if(d.world !== state.world) return;
+        const div = document.createElement('div');
+        div.className = 'entity';
+        div.style.left = d.x+'px'; div.style.top = d.y+'px';
+        div.onclick = () => openPanel(i);
+        div.innerHTML = `<div class="cage rar-${d.rar}"><div class="lvl-badge">LV. ${d.lvl}</div><div class="dino-photo">${d.img}</div></div>`;
+        layer.appendChild(div);
+    });
+    if(state.placing) {
+        const p = document.createElement('div');
+        p.className = 'entity';
+        p.style.left = state.placing.x+'px'; p.style.top = state.placing.y+'px';
+        p.innerHTML = `<div class="cage rar-${state.placing.rar}" style="border-style:dashed; opacity:0.6">${state.placing.img}</div>`;
+        layer.appendChild(p);
+    }
+}
+
+function openPanel(i) {
+    state.selected = i;
+    let d = state.dinos[i];
+    document.getElementById('panel').style.display = 'block';
+    document.getElementById('p-name').innerText = d.name;
+    document.getElementById('p-name').style.color = `var(--${d.rar})`;
+    document.getElementById('p-stats').innerHTML = `CATEGORIA: ${d.cat.toUpperCase()}<br>RARIDADE: ${d.rar.toUpperCase()}`;
+    document.getElementById('p-up-cost').innerText = (d.lvl * 35000).toLocaleString();
+}
+
+function fuse(type) {
+    let reqA = type.includes('Indominus') ? "Tyrannosaurus" : "Indominus";
+    let reqB = "Velociraptor";
+    let idxA = state.dinos.findIndex(d => d.name.includes(reqA) && d.lvl >= 30);
+    let idxB = state.dinos.findIndex(d => d.name.includes(reqB) && d.lvl >= 30);
+    if(idxA !== -1 && idxB !== -1) {
+        state.dinos.splice(Math.max(idxA, idxB), 1); state.dinos.splice(Math.min(idxA, idxB), 1);
+        state.inv.push(generate('hibrido', type)); alert("HÍBRIDO CRIADO!"); closeModals(); render();
+    } else alert("Requisitos: " + reqA + " e " + reqB + " no Nível 30!");
+}
+
+function upgradeDino() { let d = state.dinos[state.selected]; let c = d.lvl * 35000; if(state.food >= c){ state.food -= c; d.lvl++; openPanel(state.selected); render(); }}
+function initMove() { state.placing = state.dinos.splice(state.selected, 1)[0]; document.getElementById('btn-confirm').style.display='block'; closePanel(); render(); }
+function sellDino() { state.cash += 50000; state.dinos.splice(state.selected, 1); closePanel(); render(); }
+function teleportToDinos() { let t = state.dinos.find(d => d.world === state.world); if(t) { state.cam.x = -t.x + (window.innerWidth/2); state.cam.y = -t.y + (window.innerHeight/2); updateMap(); } }
+function openIndex() { openModal('index'); const g = document.getElementById('idx-grid'); g.innerHTML = ''; state.discovered.sort().forEach(n => g.innerHTML += `<div style="padding:10px; background:rgba(255,255,255,0.1); border-radius:10px">🦴 ${n}</div>`); }
+function updateMap() { document.getElementById('map').style.transform = `translate(${state.cam.x}px, ${state.cam.y}px)`; }
+function setupFood() { const b = document.getElementById('btn-food'); let t; b.onpointerdown = () => t = setInterval(() => { if(state.cash >= 20000){ state.cash -= 20000; state.food += 80000; } }, 100); b.onpointerup = () => clearInterval(t); }
+function save() { localStorage.setItem('dino_v_final_prec', JSON.stringify(state)); }
+function load() { let s = localStorage.getItem('dino_v_final_prec'); if(s) state = {...state, ...JSON.parse(s)}; }
+function openModal(id) { closeModals(); document.getElementById('modal-'+id).style.display = 'block'; if(id === 'inv'){ const l = document.getElementById('inv-list'); l.innerHTML = ''; state.inv.forEach((d, i) => l.innerHTML += `<button class="btn" style="border:1px solid var(--${d.rar})" onclick="startPlacement(${i})">${d.img} ${d.name}</button>`); }}
+function closeModals() { document.querySelectorAll('.modal').forEach(m => m.style.display='none'); }
+function closePanel() { document.getElementById('panel').style.display='none'; }
+
+let isD = false, lx, ly;
+window.onpointerdown = (e) => { isD = true; lx = e.pageX; ly = e.pageY; };
+window.onpointermove = (e) => { if(!isD) return; let dx = e.pageX - lx; let dy = e.pageY - ly; if(state.placing){ state.placing.x += dx; state.placing.y += dy; render(); } else { state.cam.x += dx; state.cam.y += dy; updateMap(); } lx = e.pageX; ly = e.pageY; };
+window.onpointerup = () => isD = false;
+
+init();
+</script>
+</body>
+</html>
