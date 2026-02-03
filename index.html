@@ -136,7 +136,7 @@ function tick() {
         let m = {comum:1, incomum:3, raro:10, epico:30, lendario:100, hibrido:400}[d.rar] || 1;
         
         // DOBRO de lucro para o Indoraptor
-        if(d.name === "Indoraptor") m = 800; 
+        if(d.name === "Indoraptor") m = 1600; 
 
         let p = (d.lvl * b * m) / 10; inc += p; d.lastInc = p * 10;
     });
