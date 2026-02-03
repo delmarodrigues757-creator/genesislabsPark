@@ -59,6 +59,10 @@
         .rar-lendario { border-color: var(--lendario); box-shadow: 0 0 20px var(--lendario); }
         .rar-hibrido { border-color: var(--hibrido); box-shadow: 0 0 20px var(--hibrido); }
 
+        /* ESTILO INVENTARIO */
+        .inv-item { display: flex; gap: 5px; margin-bottom: 5px; }
+        .btn-sell-inv { background: #e74c3c !important; color: white !important; width: 60px !important; }
+
         @keyframes fO { 0% { opacity: 1; } 100% { opacity: 0; transform: translateX(-30px); } }
     </style>
 </head>
@@ -120,13 +124,16 @@ function abb(n) {
 }
 
 const DATA = {
-    carn: [{n:"Tyrannosaurus Rex", e:"🦖"}, {n:"Velociraptor", e:"🦎"}, {n:"Spinosaurus", e:"🐊"}, {n:"Giganotosaurus", e:"👹"}, {n:"Allosaurus", e:"🐲"}, {n:"Baryonyx", e:"🐉"}, {n:"Carnotaurus", e:"🐂"}, {n:"Dilophosaurus", e:"🐍"}, {n:"Ceratosaurus", e:"👺"}, {n:"Majungasaurus", e:"👽"}, {n:"Albertosaurus", e:"🐾"}, {n:"Utahraptor", e:"🦅"}, {n:"Acrocanthosaurus", e:"🌵"}, {n:"Compsognathus", e:"🐁"}, {n:"Metriacanthosaurus", e:"🦎"}, {n:"Herrerasaurus", e:"🦎"}, {n:"Troodon", e:"👁️"}, {n:"Yutyrannus", e:"❄️"}, {n:"Concavenator", e:"⛰️"}, {n:"Indosuchus", e:"🐊"}],
-    herb: [{n:"Triceratops", e:"🚜"}, {n:"Brachiosaurus", e:"🦕"}, {n:"Stegosaurus", e:"🛡️"}, {n:"Ankylosaurus", e:"🔨"}, {n:"Parasaurolophus", e:"🎺"}, {n:"Diplodocus", e:"🦒"}, {n:"Apatosaurus", e:"⛰️"}, {n:"Iguanodon", e:"👍"}, {n:"Pachycephalosaurus", e:"👊"}, {n:"Styracosaurus", e:"🦄"}, {n:"Gallimimus", e:"🏃"}, {n:"Therizinosaurus", e:"💅"}, {n:"Maiasaura", e:"👩"}, {n:"Corythosaurus", e:"🎭"}, {n:"Edmontosaurus", e:"🦆"}, {n:"Argentinosaurus", e:"🏢"}, {n:"Ouranosaurus", e:"🐪"}, {n:"Kentrosaurus", e:"📍"}, {n:"Pachyrhinosaurus", e:"👃"}, {n:"Microceratus", e:"🐜"}],
-    fly: [{n:"Pteranodon", e:"🦅"}, {n:"Quetzalcoatlus", e:"✈️"}, {n:"Dimorphodon", e:"🦇"}, {n:"Tapejara", e:"🛶"}, {n:"Cearadactylus", e:"🧤"}, {n:"Archaeopteryx", e:"🐦"}, {n:"Rhamphorhynchus", e:"🎣"}, {n:"Tupandactylus", e:"🎈"}, {n:"Pterodactylus", e:"🪁"}, {n:"Alanqa", e:"🏜️"}],
-    wat: [{n:"Mosasaurus", e:"🦈"}, {n:"Plesiosaurus", e:"🐍"}, {n:"Elasmosaurus", e:"🦒"}, {n:"Tylosaurus", e:"🐋"}, {n:"Kronosaurus", e:"🐊"}, {n:"Dunkleosteus", e:"🛡️"}, {n:"Basilosaurus", e:"🐉"}, {n:"Ichthyosaurus", e:"🐬"}, {n:"Megalodon", e:"🦷"}, {n:"Liopleurodon", e:"🐳"}],
+    carn: [{n:"Tyrannosaurus Rex", e:"Rex"}, {n:"Velociraptor", e:"Rap"}, {n:"Spinosaurus", e:"Spi"}, {n:"Giganotosaurus", e:"Gig"}, {n:"Allosaurus", e:"Allo"}, {n:"Baryonyx", e:"Bar"}, {n:"Carnotaurus", e:"Car"}, {n:"Dilophosaurus", e:"Dil"}, {n:"Ceratosaurus", e:"Cer"}, {n:"Majungasaurus", e:"Maj"}, {n:"Albertosaurus", e:"Alb"}, {n:"Utahraptor", e:"Uta"}, {n:"Acrocanthosaurus", e:"Acro"}, {n:"Compsognathus", e:"Com"}, {n:"Metriacanthosaurus", e:"Met"}, {n:"Herrerasaurus", e:"Her"}, {n:"Troodon", e:"Tro"}, {n:"Yutyrannus", e:"Yut"}, {n:"Concavenator", e:"Con"}, {n:"Indosuchus", e:"Indo"}],
+    herb: [{n:"Triceratops", e:"Tri"}, {n:"Brachiosaurus", e:"Bra"}, {n:"Stegosaurus", e:"Ste"}, {n:"Ankylosaurus", e:"Ank"}, {n:"Parasaurolophus", e:"Par"}, {n:"Diplodocus", e:"Dip"}, {n:"Apatosaurus", e:"Apa"}, {n:"Iguanodon", e:"Igu"}, {n:"Pachycephalosaurus", e:"Pac"}, {n:"Styracosaurus", e:"Sty"}, {n:"Gallimimus", e:"Gal"}, {n:"Therizinosaurus", e:"The"}, {n:"Maiasaura", e:"Maia"}, {n:"Corythosaurus", e:"Cor"}, {n:"Edmontosaurus", e:"Edm"}, {n:"Argentinosaurus", e:"Arg"}, {n:"Ouranosaurus", e:"Our"}, {n:"Kentrosaurus", e:"Ken"}, {n:"Pachyrhinosaurus", e:"Pachy"}, {n:"Microceratus", e:"Mic"}],
+    fly: [{n:"Pteranodon", e:"Pte"}, {n:"Quetzalcoatlus", e:"Que"}, {n:"Dimorphodon", e:"Dim"}, {n:"Tapejara", e:"Tap"}, {n:"Cearadactylus", e:"Cea"}, {n:"Archaeopteryx", e:"Arc"}, {n:"Rhamphorhynchus", e:"Rha"}, {n:"Tupandactylus", e:"Tup"}, {n:"Pterodactylus", e:"Pte"}, {n:"Alanqa", e:"Ala"}],
+    wat: [{n:"Mosasaurus", e:"Mos"}, {n:"Plesiosaurus", e:"Ple"}, {n:"Elasmosaurus", e:"Ela"}, {n:"Tylosaurus", e:"Tyl"}, {n:"Kronosaurus", e:"Kro"}, {n:"Dunkleosteus", e:"Dun"}, {n:"Basilosaurus", e:"Bas"}, {n:"Ichthyosaurus", e:"Ich"}, {n:"Megalodon", e:"Meg"}, {n:"Liopleurodon", e:"Lio"}],
     ceno: [{n:"Tigre Dente de Sabre", e:"🐅"}, {n:"Mammuthus", e:"🦣"}, {n:"Gigantopitecos", e:"🦍"}, {n:"Megatherium", e:"🦥"}, {n:"Smilodon Populator", e:"🐱"}, {n:"Doedicurus", e:"⚽"}, {n:"Elasmotherium", e:"🦏"}, {n:"Procoptodon", e:"🦘"}, {n:"Andrewsarchus", e:"🐺"}, {n:"Entelodon", e:"🐗"}, {n:"Megaloceros", e:"🦌"}, {n:"Phorusrhacos", e:"🐦"}, {n:"Uintatherium", e:"🐘"}, {n:"Arctodus", e:"🐻"}, {n:"Thylacosmilus", e:"🐆"}, {n:"Basilosaurus Ceno", e:"🐳"}, {n:"Hyaenodon", e:"🐕"}, {n:"Deinotherium", e:"🐘"}, {n:"Sivatherium", e:"🦒"}, {n:"Diprotodon", e:"🐨"}, {n:"Macrauchenia", e:"🐘"}, {n:"Kelenken", e:"🦅"}, {n:"Titanoboa", e:"🐍"}, {n:"Gastornis", e:"🦆"}, {n:"Chalicotherium", e:"🦍"}],
     hibrido: [{n:"Indominus Rex", e:"🧬"}, {n:"Indoraptor", e:"🖤"}, {n:"Stegoceratops", e:"🛡️"}, {n:"Spinoraptor", e:"🐊"}, {n:"Ankylodocus", e:"🔨"}, {n:"Koolasaurus", e:"🐸"}, {n:"Ostafrikasaurus", e:"👹"}, {n:"Priotrodon", e:"🐉"}, {n:"Suprannotitan", e:"🌋"}, {n:"Erliphosaurus", e:"🦢"}, {n:"Giganocephalus", e:"🐢"}, {n:"Pachyceratops", e:"👊"}, {n:"Metrialong", e:"🐍"}, {n:"Unayrhynchus", e:"🐦"}, {n:"Rajastega", e:"👑"}]
 };
+
+// Pequeno ajuste nos emojis visuais para facilitar a leitura
+Object.keys(DATA).forEach(k => DATA[k].forEach(d => { if(d.e.length < 4) d.e = "🦖"; }));
 
 let state = { cash: 100000, food: 100000, cenoDNA: 0, dinos: [], inv: [], discovered: [], expEnd: 0, world: 'normal', cam: {x:-3800, y:-3800} };
 
@@ -208,13 +215,33 @@ function upgradeDino() {
     if(state.food >= cost) { state.food -= cost; d.lvl++; openPanel(state.selected); render(); addLog("⭐ Level UP!"); }
 }
 
+// CORREÇÃO DO BUG: Remover os dinos usados na fusão
 function fuse(t) {
-    const r30 = state.dinos.some(d => d.name === "Velociraptor" && d.lvl >= 30);
-    const t30 = state.dinos.some(d => d.name === "Tyrannosaurus Rex" && d.lvl >= 30);
-    const i30 = state.dinos.some(d => d.name === "Indominus Rex" && d.lvl >= 30);
-    if(t==='Indominus Rex' && r30 && t30 && state.cash >= 5e5) { state.cash-=5e5; state.inv.push(generate('hibrido',t)); closeModals(); }
-    else if(t==='Indoraptor' && i30 && r30 && state.cash >= 1e6) { state.cash-=1e6; state.inv.push(generate('hibrido',t)); closeModals(); }
-    else alert("Requisitos: Nível 30 + Créditos.");
+    let reqs = [];
+    if(t==='Indominus Rex') reqs = ["Velociraptor", "Tyrannosaurus Rex"];
+    if(t==='Indoraptor') reqs = ["Indominus Rex", "Velociraptor"];
+
+    let cost = t === 'Indominus Rex' ? 5e5 : 1e6;
+    
+    // Verifica se tem os dois dinos no nível 30
+    let d1 = state.dinos.findIndex(d => d.name === reqs[0] && d.lvl >= 30);
+    let d2 = state.dinos.findIndex(d => d.name === reqs[1] && d.lvl >= 30);
+
+    if(d1 !== -1 && d2 !== -1 && state.cash >= cost) {
+        state.cash -= cost;
+        // Remove os dinos usados (ordem decrescente para não errar o index)
+        let indices = [d1, d2].sort((a,b) => b-a);
+        state.dinos.splice(indices[0], 1);
+        state.dinos.splice(indices[1], 1);
+        
+        state.inv.push(generate('hibrido', t)); 
+        addLog("🧬 SUCESSO NO EXPERIMENTO!");
+        closeModals();
+        render();
+        save();
+    } else {
+        alert("Requisitos: Ambos dinos nível 30 no MAPA + Créditos.");
+    }
 }
 
 function addLog(t) { const l = document.getElementById('log'); const d = document.createElement('div'); d.className = 'log-msg'; d.innerText = t; l.prepend(d); setTimeout(()=>d.remove(), 4000); }
@@ -238,14 +265,35 @@ function render() {
 
 function openModal(id) {
     closeModals(); document.getElementById('modal-'+id).style.display = 'block';
-    if(id === 'inv') { const g = document.getElementById('inv-grid'); g.innerHTML = ''; state.inv.forEach((d, i) => g.innerHTML += `<button class="btn" style="border-bottom:3px solid var(--${d.rar})" onclick="startPlacement(${i})">${d.img} ${d.name}</button>`); }
+    if(id === 'inv') { 
+        const g = document.getElementById('inv-grid'); 
+        g.innerHTML = ''; 
+        state.inv.forEach((d, i) => {
+            const item = document.createElement('div');
+            item.className = 'inv-item';
+            item.innerHTML = `
+                <button class="btn" style="flex:1; border-bottom:3px solid var(--${d.rar})" onclick="startPlacement(${i})">${d.img} ${d.name}</button>
+                <button class="btn btn-sell-inv" onclick="sellFromInv(${i})">VENDER</button>
+            `;
+            g.appendChild(item);
+        }); 
+    }
     if(id === 'index') { const l = document.getElementById('idx-list'); l.innerHTML = ''; Object.values(DATA).flat().forEach(obj => { const f = state.discovered.includes(obj.n); l.innerHTML += `<div style="background:rgba(255,255,255,0.05); padding:5px; border-radius:8px; font-size:9px; ${f?'':'opacity:0.2'}">${f?obj.e:'?'} ${f?obj.n:'???'}</div>`; }); }
+}
+
+// Vender direto do inventário
+function sellFromInv(i) {
+    state.cash += 15000;
+    state.inv.splice(i, 1);
+    openModal('inv');
+    addLog("💰 Vendido por $15K");
+    save();
 }
 
 function startPlacement(i) { state.placing = state.inv.splice(i, 1)[0]; state.placing.x = Math.abs(state.cam.x)+window.innerWidth/2; state.placing.y = Math.abs(state.cam.y)+window.innerHeight/2; document.getElementById('btn-confirm').style.display='block'; closeModals(); render(); }
 function confirmPlacement() { state.dinos.push(state.placing); state.placing = null; document.getElementById('btn-confirm').style.display='none'; render(); save(); }
 function initMove() { state.placing = state.dinos.splice(state.selected, 1)[0]; document.getElementById('btn-confirm').style.display='block'; closePanel(); render(); }
-function sellDino() { state.cash += 50000; state.dinos.splice(state.selected, 1); closePanel(); render(); }
+function sellDino() { state.cash += 50000; state.dinos.splice(state.selected, 1); closePanel(); render(); save(); }
 function setupFood() { const b = document.getElementById('btn-food'); let t; b.onpointerdown = () => t = setInterval(() => { if(state.cash >= 2500){ state.cash -= 2500; state.food += 15000; } }, 70); b.onpointerup = () => clearInterval(t); }
 
 function save() { localStorage.setItem('DINO_FULL_SAVE', JSON.stringify(state)); }
