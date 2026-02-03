@@ -18,30 +18,26 @@
         .v { font-size: 13px; font-weight: 900; color: #fff; }
         .l { font-size: 8px; color: var(--n); text-transform: uppercase; display: block; }
 
-        /* BOTÃO MAPA */
         #btn-map-toggle { cursor:pointer; text-align:center; border-radius:8px; border:1px solid var(--n); transition: 0.3s; }
         .active-ceno { border-color: var(--ceno) !important; background: rgba(0, 242, 255, 0.2); box-shadow: 0 0 10px var(--ceno); }
 
-        /* MAPA */
         #viewport { width: 100vw; height: 100vh; position: relative; overflow: hidden; }
         #map { position: absolute; width: 8000px; height: 8000px; transform-origin: 0 0; }
         .map-normal { background-color: #02050a; background-image: linear-gradient(rgba(0, 212, 255, 0.05) 1.5px, transparent 1.5px), linear-gradient(90deg, rgba(0, 212, 255, 0.05) 1.5px, transparent 1.5px); background-size: 80px 80px; }
         .map-ceno { background-color: #0d2533; background-image: radial-gradient(circle, #00f2ff22 1px, transparent 1px); background-size: 50px 50px; }
         
-        /* ENTIDADES */
         .entity { position: absolute; transform: translate(-50%, -50%); z-index: 10; }
         .cage { width: 110px; height: 110px; border: 3px solid #fff; border-radius: 25px; background: rgba(0,0,0,0.9); display: flex; align-items: center; justify-content: center; position: relative; }
         .income-tag { position: absolute; bottom: -25px; background: #000; color: #2ecc71; padding: 2px 8px; border-radius: 5px; font-size: 10px; font-weight: 900; border: 1px solid #2ecc71; white-space: nowrap; }
         .lvl-badge { position: absolute; top: -12px; background: #fff; color: #000; padding: 2px 10px; border-radius: 10px; font-size: 9px; font-weight: 900; border: 2px solid var(--n); }
 
-        /* MIRA NEON */
         .placement-guide { position: absolute; width: 150px; height: 150px; border: 3px dashed var(--n); border-radius: 50%; transform: translate(-50%, -50%); background: rgba(0, 212, 255, 0.1); pointer-events: none; z-index: 5; animation: pulse 1s infinite; }
         @keyframes pulse { 0%, 100% { scale: 0.9; opacity: 0.3; } 50% { scale: 1.1; opacity: 0.7; } }
 
-        /* MODAIS */
         .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.96); padding: 20px; display: none; z-index: 5000; overflow-y: auto; }
         .m-card { background: #0d1526; border: 2px solid var(--n); border-radius: 30px; padding: 20px; max-width: 500px; margin: auto; }
-        .btn { background: var(--n); color: #000; border: none; padding: 12px; border-radius: 12px; width: 100%; margin: 4px 0; font-weight: 900; cursor: pointer; text-transform: uppercase; font-size: 11px; }
+        .btn { background: var(--n); color: #000; border: none; padding: 12px; border-radius: 12px; width: 100%; margin: 4px 0; font-weight: 900; cursor: pointer; text-transform: uppercase; font-size: 11px; transition: 0.2s; }
+        .btn:active { transform: scale(0.95); }
 
         nav { position: fixed; bottom: 0; width: 100%; height: 85px; background: rgba(5, 10, 20, 0.98); border-top: 2px solid var(--n); display: flex; z-index: 1000; }
         .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 8px; }
@@ -51,7 +47,6 @@
         #log { position: fixed; bottom: 95px; left: 10px; pointer-events: none; z-index: 4000; }
         .log-msg { background: rgba(0,0,0,0.9); color: var(--n); padding: 8px 15px; border-radius: 8px; margin-top: 5px; font-size: 10px; border-left: 4px solid var(--n); animation: fO 4s forwards; }
 
-        /* RARIDADES */
         .rar-comum { border-color: var(--comum); }
         .rar-incomum { border-color: var(--incomum); }
         .rar-raro { border-color: var(--raro); box-shadow: 0 0 10px var(--raro); }
@@ -59,9 +54,9 @@
         .rar-lendario { border-color: var(--lendario); box-shadow: 0 0 20px var(--lendario); }
         .rar-hibrido { border-color: var(--hibrido); box-shadow: 0 0 20px var(--hibrido); }
 
-        /* ESTILO INVENTARIO */
-        .inv-item { display: flex; gap: 5px; margin-bottom: 5px; }
-        .btn-sell-inv { background: #e74c3c !important; color: white !important; width: 60px !important; }
+        /* Estilo para lista de inventário com botão vender */
+        .inv-row { display: flex; gap: 5px; margin-bottom: 5px; align-items: stretch; }
+        .btn-sell-inv { background: #ff4757 !important; color: #fff !important; width: 80px !important; }
 
         @keyframes fO { 0% { opacity: 1; } 100% { opacity: 0; transform: translateX(-30px); } }
     </style>
@@ -90,7 +85,7 @@
 
 <div id="modal-shop" class="modal"><div class="m-card"><h2>LOJA</h2><div style="display:grid; grid-template-columns:1fr 1fr; gap:8px"><button class="btn" onclick="buy('carn', 30000)">🥩 CARNÍVOROS<br>$30K</button><button class="btn" onclick="buy('herb', 20000)">🌿 HERBÍVOROS<br>$20K</button><button class="btn" onclick="buy('fly', 45000)">🦅 VOADORES<br>$45K</button><button class="btn" onclick="buy('wat', 70000)">🦈 AQUÁTICOS<br>$70K</button></div><button class="btn" style="background:var(--ceno); margin-top:10px; border:2px solid #fff" onclick="buy('ceno', 0)">🧬 USAR CENO-DNA (1)</button><button class="btn" style="background:#333; color:#fff" onclick="closeModals()">FECHAR</button></div></div>
 
-<div id="modal-lab" class="modal"><div class="m-card"><h2>LABORATÓRIO</h2><div style="background:rgba(0,0,0,0.5); padding:10px; border-radius:15px; border-left:4px solid var(--hibrido); margin-bottom:10px"><b>INDOMINUS REX ($500K)</b><br><small>T-Rex Lvl 30 + Raptor Lvl 30</small></div><button class="btn" onclick="fuse('Indominus Rex')">🧬 FUNDIR INDOMINUS</button><div style="background:rgba(0,0,0,0.5); padding:10px; border-radius:15px; border-left:4px solid var(--hibrido); margin:10px 0"><b>INDORAPTOR ($1M)</b><br><small>Indominus Lvl 30 + Raptor Lvl 30</small></div><button class="btn" onclick="fuse('Indoraptor')">🧬 FUNDIR INDORAPTOR</button><button class="btn" style="background:#333" onclick="closeModals()">FECHAR</button></div></div>
+<div id="modal-lab" class="modal"><div class="m-card"><h2>LABORATÓRIO</h2><div style="background:rgba(0,0,0,0.5); padding:10px; border-radius:15px; border-left:4px solid var(--hibrido); margin-bottom:10px"><b>INDOMINUS REX ($500K)</b><br><small>T-Rex Lvl 30 + Raptor Lvl 30</small></div><button class="btn" onclick="fuse('Indominus Rex')">🧬 FUNDIR INDOMINUS</button><div style="background:rgba(0,0,0,0.5); padding:10px; border-radius:15px; border-left:4px solid var(--hibrido); margin:10px 0"><b>INDORAPTOR ($1M)</b><br><small>Indominus Lvl 30 + Raptor Lvl 30</small></div><button class="btn" onclick="fuse('Indoraptor')">🧬 FUNDIR INDORAPTOR (OP)</button><button class="btn" style="background:#333" onclick="closeModals()">FECHAR</button></div></div>
 
 <div id="modal-exp" class="modal"><div class="m-card"><h2>EXPEDIÇÃO GLOBAL</h2><div style="background:rgba(255,255,255,0.05); padding:15px; border-radius:15px; border: 1px solid var(--n)"><b>MISSÃO DE BUSCA</b><br><p>Custo: $75K | Tempo: 40s</p><button id="exp-btn" class="btn" onclick="startExp(40, 75000)">INICIAR</button></div><p id="exp-timer" style="text-align:center; color:var(--n); font-weight:900"></p><button class="btn" style="background:#333" onclick="closeModals()">FECHAR</button></div></div>
 
@@ -124,16 +119,13 @@ function abb(n) {
 }
 
 const DATA = {
-    carn: [{n:"Tyrannosaurus Rex", e:"Rex"}, {n:"Velociraptor", e:"Rap"}, {n:"Spinosaurus", e:"Spi"}, {n:"Giganotosaurus", e:"Gig"}, {n:"Allosaurus", e:"Allo"}, {n:"Baryonyx", e:"Bar"}, {n:"Carnotaurus", e:"Car"}, {n:"Dilophosaurus", e:"Dil"}, {n:"Ceratosaurus", e:"Cer"}, {n:"Majungasaurus", e:"Maj"}, {n:"Albertosaurus", e:"Alb"}, {n:"Utahraptor", e:"Uta"}, {n:"Acrocanthosaurus", e:"Acro"}, {n:"Compsognathus", e:"Com"}, {n:"Metriacanthosaurus", e:"Met"}, {n:"Herrerasaurus", e:"Her"}, {n:"Troodon", e:"Tro"}, {n:"Yutyrannus", e:"Yut"}, {n:"Concavenator", e:"Con"}, {n:"Indosuchus", e:"Indo"}],
-    herb: [{n:"Triceratops", e:"Tri"}, {n:"Brachiosaurus", e:"Bra"}, {n:"Stegosaurus", e:"Ste"}, {n:"Ankylosaurus", e:"Ank"}, {n:"Parasaurolophus", e:"Par"}, {n:"Diplodocus", e:"Dip"}, {n:"Apatosaurus", e:"Apa"}, {n:"Iguanodon", e:"Igu"}, {n:"Pachycephalosaurus", e:"Pac"}, {n:"Styracosaurus", e:"Sty"}, {n:"Gallimimus", e:"Gal"}, {n:"Therizinosaurus", e:"The"}, {n:"Maiasaura", e:"Maia"}, {n:"Corythosaurus", e:"Cor"}, {n:"Edmontosaurus", e:"Edm"}, {n:"Argentinosaurus", e:"Arg"}, {n:"Ouranosaurus", e:"Our"}, {n:"Kentrosaurus", e:"Ken"}, {n:"Pachyrhinosaurus", e:"Pachy"}, {n:"Microceratus", e:"Mic"}],
-    fly: [{n:"Pteranodon", e:"Pte"}, {n:"Quetzalcoatlus", e:"Que"}, {n:"Dimorphodon", e:"Dim"}, {n:"Tapejara", e:"Tap"}, {n:"Cearadactylus", e:"Cea"}, {n:"Archaeopteryx", e:"Arc"}, {n:"Rhamphorhynchus", e:"Rha"}, {n:"Tupandactylus", e:"Tup"}, {n:"Pterodactylus", e:"Pte"}, {n:"Alanqa", e:"Ala"}],
-    wat: [{n:"Mosasaurus", e:"Mos"}, {n:"Plesiosaurus", e:"Ple"}, {n:"Elasmosaurus", e:"Ela"}, {n:"Tylosaurus", e:"Tyl"}, {n:"Kronosaurus", e:"Kro"}, {n:"Dunkleosteus", e:"Dun"}, {n:"Basilosaurus", e:"Bas"}, {n:"Ichthyosaurus", e:"Ich"}, {n:"Megalodon", e:"Meg"}, {n:"Liopleurodon", e:"Lio"}],
-    ceno: [{n:"Tigre Dente de Sabre", e:"🐅"}, {n:"Mammuthus", e:"🦣"}, {n:"Gigantopitecos", e:"🦍"}, {n:"Megatherium", e:"🦥"}, {n:"Smilodon Populator", e:"🐱"}, {n:"Doedicurus", e:"⚽"}, {n:"Elasmotherium", e:"🦏"}, {n:"Procoptodon", e:"🦘"}, {n:"Andrewsarchus", e:"🐺"}, {n:"Entelodon", e:"🐗"}, {n:"Megaloceros", e:"🦌"}, {n:"Phorusrhacos", e:"🐦"}, {n:"Uintatherium", e:"🐘"}, {n:"Arctodus", e:"🐻"}, {n:"Thylacosmilus", e:"🐆"}, {n:"Basilosaurus Ceno", e:"🐳"}, {n:"Hyaenodon", e:"🐕"}, {n:"Deinotherium", e:"🐘"}, {n:"Sivatherium", e:"🦒"}, {n:"Diprotodon", e:"🐨"}, {n:"Macrauchenia", e:"🐘"}, {n:"Kelenken", e:"🦅"}, {n:"Titanoboa", e:"🐍"}, {n:"Gastornis", e:"🦆"}, {n:"Chalicotherium", e:"🦍"}],
-    hibrido: [{n:"Indominus Rex", e:"🧬"}, {n:"Indoraptor", e:"🖤"}, {n:"Stegoceratops", e:"🛡️"}, {n:"Spinoraptor", e:"🐊"}, {n:"Ankylodocus", e:"🔨"}, {n:"Koolasaurus", e:"🐸"}, {n:"Ostafrikasaurus", e:"👹"}, {n:"Priotrodon", e:"🐉"}, {n:"Suprannotitan", e:"🌋"}, {n:"Erliphosaurus", e:"🦢"}, {n:"Giganocephalus", e:"🐢"}, {n:"Pachyceratops", e:"👊"}, {n:"Metrialong", e:"🐍"}, {n:"Unayrhynchus", e:"🐦"}, {n:"Rajastega", e:"👑"}]
+    carn: [{n:"Tyrannosaurus Rex", e:"🦖"}, {n:"Velociraptor", e:"🦎"}, {n:"Spinosaurus", e:"🐊"}],
+    herb: [{n:"Triceratops", e:"🚜"}, {n:"Brachiosaurus", e:"🦕"}, {n:"Stegosaurus", e:"🛡️"}],
+    fly: [{n:"Pteranodon", e:"🦅"}, {n:"Quetzalcoatlus", e:"✈️"}],
+    wat: [{n:"Mosasaurus", e:"🦈"}, {n:"Plesiosaurus", e:"🐍"}],
+    ceno: [{n:"Tigre Dente de Sabre", e:"🐅"}, {n:"Mammuthus", e:"🦣"}],
+    hibrido: [{n:"Indominus Rex", e:"🧬"}, {n:"Indoraptor", e:"🖤"}]
 };
-
-// Pequeno ajuste nos emojis visuais para facilitar a leitura
-Object.keys(DATA).forEach(k => DATA[k].forEach(d => { if(d.e.length < 4) d.e = "🦖"; }));
 
 let state = { cash: 100000, food: 100000, cenoDNA: 0, dinos: [], inv: [], discovered: [], expEnd: 0, world: 'normal', cam: {x:-3800, y:-3800} };
 
@@ -142,12 +134,16 @@ function tick() {
     state.dinos.forEach(d => {
         let b = (d.cat === 'ceno' || d.rar === 'hibrido') ? 1500 : 250;
         let m = {comum:1, incomum:3, raro:10, epico:30, lendario:100, hibrido:400}[d.rar] || 1;
+        
+        // DOBRO de lucro para o Indoraptor
+        if(d.name === "Indoraptor") m = 800; 
+
         let p = (d.lvl * b * m) / 10; inc += p; d.lastInc = p * 10;
     });
     state.cash += inc;
 
     if(state.expEnd > Date.now()) {
-        document.getElementById('exp-timer').innerText = `Equipe em missão: ${Math.ceil((state.expEnd - Date.now())/1000)}s`;
+        document.getElementById('exp-timer').innerText = `Expedição: ${Math.ceil((state.expEnd - Date.now())/1000)}s`;
         document.getElementById('exp-btn').disabled = true;
     } else {
         if(state.expEnd !== 0) finishExp();
@@ -162,93 +158,85 @@ function tick() {
 }
 
 function switchWorld() {
-    const btn = document.getElementById('btn-map-toggle');
-    const label = document.getElementById('v-world');
-    if (state.world === 'normal') {
-        state.world = 'ceno'; label.innerText = "CENOZOICO"; btn.classList.add('active-ceno');
-        document.getElementById('map').className = 'map-ceno';
-    } else {
-        state.world = 'normal'; label.innerText = "NORMAL"; btn.classList.remove('active-ceno');
-        document.getElementById('map').className = 'map-normal';
-    }
+    state.world = state.world === 'normal' ? 'ceno' : 'normal';
+    document.getElementById('v-world').innerText = state.world.toUpperCase();
+    document.getElementById('map').className = 'map-' + state.world;
     render();
 }
 
 function buy(cat, p) {
-    if(cat === 'ceno') {
-        if(state.cenoDNA >= 1) { state.cenoDNA--; state.inv.push(generate('ceno')); addLog("❄️ DNA Usado!"); openModal('inv'); }
-        else alert("Você precisa de Ceno-DNA!"); return;
-    }
-    if(state.cash >= p) { state.cash -= p; state.inv.push(generate(cat)); openModal('inv'); }
-}
-
-function startExp(t, c) { if(state.cash >= c) { state.cash -= c; state.expEnd = Date.now() + (t*1000); addLog("✈️ Avião decolou!"); } }
-
-function finishExp() {
-    state.expEnd = 0; let r = Math.random();
-    if(r < 0.05) { state.cenoDNA++; addLog("✨ RARO: Ceno-DNA Encontrado!"); }
-    else if(r < 0.25) { let a = 50000 + Math.random()*100000; state.food += a; addLog(`🥩 +${abb(a)} Carne!`); }
-    else if(r < 0.55) { let a = 200000 + Math.random()*300000; state.cash += a; addLog(`💰 +$${abb(a)} Créditos!`); }
-    else { state.inv.push(generate('carn')); addLog("🦴 Fóssil recuperado."); }
-    save();
+    if(cat === 'ceno' && state.cenoDNA < 1) return alert("DNA insuficiente!");
+    if(state.cash < p && cat !== 'ceno') return alert("Saldo insuficiente!");
+    if(cat === 'ceno') state.cenoDNA--; else state.cash -= p;
+    state.inv.push(generate(cat));
+    openModal('inv');
 }
 
 function generate(cat, forced = null) {
-    const pool = DATA[cat];
+    const pool = DATA[cat] || DATA.carn;
     let obj = forced ? pool.find(x => x.n === forced) : pool[Math.floor(Math.random() * pool.length)];
-    let rar = 'comum'; let r = Math.random();
-    if(cat === 'ceno') { if(r > 0.99) rar = 'lendario'; else if(r > 0.95) rar = 'epico'; else if(r > 0.85) rar = 'raro'; else if(r > 0.6) rar = 'incomum'; }
-    else if(!forced) { if(r > 0.98) rar = 'lendario'; else if(r > 0.9) rar = 'epico'; else if(r > 0.7) rar = 'raro'; else if(r > 0.4) rar = 'incomum'; }
-    else rar = 'hibrido';
+    let rar = forced ? 'hibrido' : (Math.random() > 0.9 ? 'lendario' : 'comum');
     if(!state.discovered.includes(obj.n)) state.discovered.push(obj.n);
     return { name: obj.n, img: obj.e, cat, rar, lvl: 1, x:0, y:0, world: (cat==='ceno'?'ceno':'normal'), lastInc: 0 };
 }
 
-function openPanel(i) {
-    state.selected = i; let d = state.dinos[i]; document.getElementById('panel').style.display = 'block';
-    document.getElementById('p-name').innerText = d.name; document.getElementById('p-up-cost').innerText = abb(d.lvl * 50000);
-    document.getElementById('p-stats').innerText = `${d.rar.toUpperCase()} | Lucro: $${abb(d.lastInc)}/s`;
+function openModal(id) {
+    closeModals(); document.getElementById('modal-'+id).style.display = 'block';
+    if(id === 'inv') {
+        const g = document.getElementById('inv-grid'); g.innerHTML = '';
+        state.inv.forEach((d, i) => {
+            const row = document.createElement('div');
+            row.className = 'inv-row';
+            row.innerHTML = `
+                <button class="btn" style="flex:1" onclick="startPlacement(${i})">${d.img} ${d.name}</button>
+                <button class="btn btn-sell-inv" onclick="sellInv(${i})">VENDER</button>
+            `;
+            g.appendChild(row);
+        });
+    }
 }
 
-function upgradeDino() {
-    let d = state.dinos[state.selected]; let cost = d.lvl * 50000;
-    if(state.food >= cost) { state.food -= cost; d.lvl++; openPanel(state.selected); render(); addLog("⭐ Level UP!"); }
+function sellInv(i) {
+    state.cash += 15000;
+    state.inv.splice(i, 1);
+    openModal('inv');
+    addLog("💰 Dino vendido!");
 }
 
-// CORREÇÃO DO BUG: Remover os dinos usados na fusão
 function fuse(t) {
-    let reqs = [];
-    if(t==='Indominus Rex') reqs = ["Velociraptor", "Tyrannosaurus Rex"];
-    if(t==='Indoraptor') reqs = ["Indominus Rex", "Velociraptor"];
+    let d1_name = (t === "Indominus Rex") ? "Tyrannosaurus Rex" : "Indominus Rex";
+    let d2_name = "Velociraptor";
+    let cost = (t === "Indominus Rex") ? 500000 : 1000000;
 
-    let cost = t === 'Indominus Rex' ? 5e5 : 1e6;
-    
-    // Verifica se tem os dois dinos no nível 30
-    let d1 = state.dinos.findIndex(d => d.name === reqs[0] && d.lvl >= 30);
-    let d2 = state.dinos.findIndex(d => d.name === reqs[1] && d.lvl >= 30);
+    let idx1 = state.dinos.findIndex(d => d.name === d1_name && d.lvl >= 30);
+    let idx2 = state.dinos.findIndex(d => d.name === d2_name && d.lvl >= 30);
 
-    if(d1 !== -1 && d2 !== -1 && state.cash >= cost) {
+    if(idx1 !== -1 && idx2 !== -1 && state.cash >= cost) {
         state.cash -= cost;
-        // Remove os dinos usados (ordem decrescente para não errar o index)
-        let indices = [d1, d2].sort((a,b) => b-a);
-        state.dinos.splice(indices[0], 1);
-        state.dinos.splice(indices[1], 1);
+        // Remove os dinos usados do mapa
+        let toRemove = [idx1, idx2].sort((a,b) => b - a);
+        state.dinos.splice(toRemove[0], 1);
+        state.dinos.splice(toRemove[1], 1);
         
-        state.inv.push(generate('hibrido', t)); 
-        addLog("🧬 SUCESSO NO EXPERIMENTO!");
+        state.inv.push(generate('hibrido', t));
+        addLog("🧬 Híbrido criado com sucesso!");
         closeModals();
         render();
         save();
     } else {
-        alert("Requisitos: Ambos dinos nível 30 no MAPA + Créditos.");
+        alert("Precisa dos dois dinos Lvl 30 no MAPA e créditos!");
     }
 }
 
-function addLog(t) { const l = document.getElementById('log'); const d = document.createElement('div'); d.className = 'log-msg'; d.innerText = t; l.prepend(d); setTimeout(()=>d.remove(), 4000); }
+function startPlacement(i) { state.placing = state.inv.splice(i, 1)[0]; state.placing.x = Math.abs(state.cam.x)+200; state.placing.y = Math.abs(state.cam.y)+200; document.getElementById('btn-confirm').style.display='block'; closeModals(); render(); }
+function confirmPlacement() { state.dinos.push(state.placing); state.placing = null; document.getElementById('btn-confirm').style.display='none'; render(); save(); }
+function openPanel(i) { state.selected = i; let d = state.dinos[i]; document.getElementById('panel').style.display = 'block'; document.getElementById('p-name').innerText = d.name; document.getElementById('p-up-cost').innerText = abb(d.lvl * 50000); }
+function upgradeDino() { let d = state.dinos[state.selected]; let cost = d.lvl * 50000; if(state.food >= cost) { state.food -= cost; d.lvl++; openPanel(state.selected); render(); } }
+function sellDino() { state.cash += 50000; state.dinos.splice(state.selected, 1); closePanel(); render(); save(); }
 function closeModals() { document.querySelectorAll('.modal').forEach(m => m.style.display='none'); }
 function closePanel() { document.getElementById('panel').style.display='none'; }
+function addLog(t) { const l = document.getElementById('log'); const d = document.createElement('div'); d.className = 'log-msg'; d.innerText = t; l.prepend(d); setTimeout(()=>d.remove(), 4000); }
 function updateLabels() { state.dinos.forEach((d, i) => { const t = document.getElementById(`inc-${i}`); if(t) t.innerText = `+$${abb(d.lastInc)}/s`; }); }
-
 function render() {
     const layer = document.getElementById('entities-layer'); layer.innerHTML = '';
     state.dinos.forEach((d, i) => {
@@ -258,46 +246,15 @@ function render() {
         div.innerHTML = `<div class="cage rar-${d.rar}"><div class="lvl-badge">LV. ${d.lvl}</div><div style="font-size:40px">${d.img}</div><div class="income-tag" id="inc-${i}">+$0/s</div></div>`;
         layer.appendChild(div);
     });
-    const ind = document.getElementById('placement-indicator');
-    if(state.placing) { ind.style.display = 'block'; ind.style.left = state.placing.x+'px'; ind.style.top = state.placing.y+'px'; }
-    else ind.style.display = 'none';
+    if(state.placing) { document.getElementById('placement-indicator').style.display = 'block'; document.getElementById('placement-indicator').style.left = state.placing.x+'px'; document.getElementById('placement-indicator').style.top = state.placing.y+'px'; }
+    else document.getElementById('placement-indicator').style.display = 'none';
 }
-
-function openModal(id) {
-    closeModals(); document.getElementById('modal-'+id).style.display = 'block';
-    if(id === 'inv') { 
-        const g = document.getElementById('inv-grid'); 
-        g.innerHTML = ''; 
-        state.inv.forEach((d, i) => {
-            const item = document.createElement('div');
-            item.className = 'inv-item';
-            item.innerHTML = `
-                <button class="btn" style="flex:1; border-bottom:3px solid var(--${d.rar})" onclick="startPlacement(${i})">${d.img} ${d.name}</button>
-                <button class="btn btn-sell-inv" onclick="sellFromInv(${i})">VENDER</button>
-            `;
-            g.appendChild(item);
-        }); 
-    }
-    if(id === 'index') { const l = document.getElementById('idx-list'); l.innerHTML = ''; Object.values(DATA).flat().forEach(obj => { const f = state.discovered.includes(obj.n); l.innerHTML += `<div style="background:rgba(255,255,255,0.05); padding:5px; border-radius:8px; font-size:9px; ${f?'':'opacity:0.2'}">${f?obj.e:'?'} ${f?obj.n:'???'}</div>`; }); }
-}
-
-// Vender direto do inventário
-function sellFromInv(i) {
-    state.cash += 15000;
-    state.inv.splice(i, 1);
-    openModal('inv');
-    addLog("💰 Vendido por $15K");
-    save();
-}
-
-function startPlacement(i) { state.placing = state.inv.splice(i, 1)[0]; state.placing.x = Math.abs(state.cam.x)+window.innerWidth/2; state.placing.y = Math.abs(state.cam.y)+window.innerHeight/2; document.getElementById('btn-confirm').style.display='block'; closeModals(); render(); }
-function confirmPlacement() { state.dinos.push(state.placing); state.placing = null; document.getElementById('btn-confirm').style.display='none'; render(); save(); }
-function initMove() { state.placing = state.dinos.splice(state.selected, 1)[0]; document.getElementById('btn-confirm').style.display='block'; closePanel(); render(); }
-function sellDino() { state.cash += 50000; state.dinos.splice(state.selected, 1); closePanel(); render(); save(); }
 function setupFood() { const b = document.getElementById('btn-food'); let t; b.onpointerdown = () => t = setInterval(() => { if(state.cash >= 2500){ state.cash -= 2500; state.food += 15000; } }, 70); b.onpointerup = () => clearInterval(t); }
-
-function save() { localStorage.setItem('DINO_FULL_SAVE', JSON.stringify(state)); }
-function load() { let r = localStorage.getItem('DINO_FULL_SAVE'); if(r) state = {...state, ...JSON.parse(r)}; }
+function save() { localStorage.setItem('DINO_SAVE', JSON.stringify(state)); }
+function load() { let r = localStorage.getItem('DINO_SAVE'); if(r) state = {...state, ...JSON.parse(r)}; }
+function startExp(t, c) { if(state.cash >= c) { state.cash -= c; state.expEnd = Date.now() + (t*1000); } }
+function finishExp() { state.expEnd = 0; state.cenoDNA++; addLog("📦 Expedição trouxe Ceno-DNA!"); save(); }
+function initMove() { state.placing = state.dinos.splice(state.selected, 1)[0]; document.getElementById('btn-confirm').style.display='block'; closePanel(); render(); }
 
 let isD = false, lx, ly;
 window.onpointerdown = (e) => { isD = true; lx = e.pageX; ly = e.pageY; };
