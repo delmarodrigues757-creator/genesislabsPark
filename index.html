@@ -1,1190 +1,677 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DINO EMPIRE: HARDCORE EDITION</title>
-
-    <!-- ESTILOS PRINCIPAIS -->
-    <style>
-        :root {
-            --comum: #95a5a6;
-            --incomum: #27ae60;
-            --raro: #2980b9;
-            --super: #8e44ad;
-            --lendario: #f39c12;
-            --hibrido: #e74c3c;
-            --ceno: #00cec9;
-            --n: #00d4ff;
-            --bg: #0b0f19;
-        }
-
-        * {
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            user-select: none;
-            outline: none;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        body {
-            margin: 0;
-            background: var(--bg);
-            color: #ecf0f1;
-            height: 100vh;
-            overflow: hidden;
-            touch-action: none;
-            font-size: 12px;
-        }
-
-        h1, h2, .v, .btn {
-            font-family: 'Arial Black', sans-serif;
-            letter-spacing: -0.5px;
-        }
-
-        /* HUD superior */
-        #hud {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            background: rgba(11, 15, 25, 0.95);
-            padding: 10px;
-            position: fixed;
-            width: 100%;
-            top: 0;
-            z-index: 1000;
-            border-bottom: 2px solid #333;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.8);
-        }
-
-        .v { font-size: 12px; color: #fff; display: block; margin-top: 2px; }
-        .l { font-size: 9px; color: #7f8c8d; font-weight: bold; display: block; }
-
-        #btn-map-toggle {
-            cursor: pointer;
-            text-align: center;
-            border-radius: 4px;
-            background: rgba(255,255,255,0.05);
-            padding: 2px;
-        }
-
-        /* Área do mapa */
-        #viewport {
-            width: 100vw;
-            height: 100vh;
-            position: relative;
-            overflow: hidden;
-        }
-
-        #map {
-            position: absolute;
-            width: 6000px;
-            height: 6000px;
-            transform-origin: 0 0;
-            will-change: transform;
-        }
-
-        .map-normal {
-            background-color: #1a1a1a;
-            background-image: radial-gradient(#333 1px, transparent 1px);
-            background-size: 40px 40px;
-        }
-
-        .map-ceno {
-            background-color: #182C36;
-            background-image: radial-gradient(#607D8B 1px, transparent 1px);
-            background-size: 40px 40px;
-        }
-
-        /* Entidades (dinos no mapa) */
-        .entity {
-            position: absolute;
-            transform: translate(-50%, -50%);
-            z-index: 10;
-            cursor: pointer;
-        }
-
-        .entity:active {
-            transform: translate(-50%, -50%) scale(0.95);
-        }
-
-        .cage {
-            width: 80px;
-            height: 80px;
-            border: 2px solid #555;
-            border-radius: 12px;
-            background: rgba(0,0,0,0.6);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            backdrop-filter: blur(4px);
-            transition: border-color 0.3s;
-        }
-
-        .income-tag {
-            position: absolute;
-            bottom: -18px;
-            background: #000;
-            color: #2ecc71;
-            padding: 2px 4px;
-            border-radius: 3px;
-            font-size: 8px;
-            font-weight: bold;
-            border: 1px solid #333;
-            white-space: nowrap;
-        }
-
-        .lvl-badge {
-            position: absolute;
-            top: -8px;
-            background: #fff;
-            color: #000;
-            padding: 1px 6px;
-            border-radius: 8px;
-            font-size: 7px;
-            font-weight: 900;
-            border: 1px solid #000;
-        }
-
-        .dino-emoji {
-            font-size: 35px;
-            filter: drop-shadow(0 4px 2px rgba(0,0,0,0.5));
-        }
-
-        .placement-guide {
-            position: absolute;
-            width: 100px;
-            height: 100px;
-            border: 2px dashed #fff;
-            border-radius: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(255,255,255,0.1);
-            pointer-events: none;
-            z-index: 5;
-        }
-
-        /* Modais */
-        .modal {
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.9);
-            padding: 20px;
-            display: none;
-            z-index: 5000;
-            overflow-y: auto;
-        }
-
-        .m-card {
-            background: #2c3e50;
-            border: 1px solid #444;
-            border-radius: 12px;
-            padding: 15px;
-            max-width: 500px;
-            margin: auto;
-            box-shadow: 0 0 40px rgba(0,0,0,0.8);
-            color: #ecf0f1;
-        }
-
-        .m-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            padding-bottom: 10px;
-        }
-
-        h2 {
-            margin: 0;
-            font-size: 16px;
-            color: var(--n);
-        }
-
-        .btn {
-            background: #34495e;
-            color: #fff;
-            border: none;
-            padding: 12px;
-            border-radius: 6px;
-            width: 100%;
-            margin: 5px 0;
-            font-weight: bold;
-            cursor: pointer;
-            text-transform: uppercase;
-            font-size: 10px;
-            transition: 0.2s;
-            box-shadow: 0 3px 0 rgba(0,0,0,0.3);
-        }
-
-        .btn:active {
-            transform: translateY(3px);
-            box-shadow: none;
-        }
-
-        .btn-close {
-            background: #c0392b;
-            margin-top: 15px;
-        }
-
-        /* Dinopédia */
-        #idx-list {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 5px;
-            max-height: 50vh;
-            overflow-y: auto;
-            padding: 5px;
-        }
-
-        .idx-card {
-            background: rgba(0,0,0,0.3);
-            border-radius: 8px;
-            padding: 8px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            border: 1px solid #444;
-            position: relative;
-            min-height: 70px;
-            justify-content: center;
-        }
-
-        .idx-emoji { font-size: 24px; }
-
-        .idx-name {
-            font-size: 7px;
-            text-align: center;
-            color: #bdc3c7;
-            margin-top: 4px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            width: 100%;
-        }
-
-        .idx-locked {
-            opacity: 0.3;
-            filter: grayscale(1);
-        }
-
-        .idx-locked::after {
-            content: "🔒";
-            position: absolute;
-            font-size: 14px;
-        }
-
-        /* Inventário */
-        .inv-row {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 8px;
-            align-items: center;
-            background: rgba(0,0,0,0.2);
-            padding: 5px;
-            border-radius: 6px;
-            border-left: 3px solid #555;
-        }
-
-        .btn-sell-inv {
-            background: #c0392b !important;
-            width: 60px !important;
-        }
-
-        /* Navegação inferior */
-        nav {
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            height: 70px;
-            background: #151820;
-            border-top: 1px solid #333;
-            display: flex;
-            z-index: 1000;
-            padding-bottom: 10px;
-        }
-
-        .nav-item {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            font-size: 8px;
-            color: #7f8c8d;
-            cursor: pointer;
-        }
-
-        .nav-item span {
-            font-size: 20px;
-            margin-bottom: 4px;
-        }
-
-        .nav-item:active {
-            background: #222;
-            color: #fff;
-        }
-
-        /* Painel de dino selecionado */
-        #panel {
-            position: fixed;
-            bottom: 80px;
-            left: 5%;
-            width: 90%;
-            background: #2c3e50;
-            border: 1px solid #fff;
-            border-radius: 12px;
-            padding: 15px;
-            display: none;
-            z-index: 2000;
-            box-shadow: 0 0 50px #000;
-        }
-
-        #log {
-            position: fixed;
-            bottom: 90px;
-            left: 10px;
-            pointer-events: none;
-            z-index: 4000;
-            width: 80%;
-        }
-
-        .log-msg {
-            background: rgba(0,0,0,0.8);
-            color: #fff;
-            padding: 4px 10px;
-            border-radius: 4px;
-            margin-top: 4px;
-            font-size: 10px;
-            border-left: 3px solid var(--n);
-            animation: fadeOut 3s forwards;
-        }
-
-        /* Classes de raridade */
-        .rar-comum { border-color: var(--comum); box-shadow: 0 0 5px var(--comum); }
-        .rar-incomum { border-color: var(--incomum); box-shadow: 0 0 8px var(--incomum); }
-        .rar-raro { border-color: var(--raro); box-shadow: 0 0 10px var(--raro); }
-        .rar-super { border-color: var(--super); box-shadow: 0 0 15px var(--super); border-width: 3px; }
-        .rar-lendario { border-color: var(--lendario); box-shadow: 0 0 20px var(--lendario); border-width: 3px; animation: shine 2s infinite; }
-        .rar-hibrido { border-color: var(--hibrido); box-shadow: 0 0 25px var(--hibrido); }
-        .rar-ceno { border-color: var(--ceno); box-shadow: 0 0 10px var(--ceno); }
-
-        #btn-confirm {
-            position: fixed;
-            bottom: 100px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 200px;
-            display: none;
-            z-index: 4000;
-            background: #27ae60;
-            border: 2px solid #fff;
-        }
-
-        @keyframes fadeOut { 0%, 80% { opacity: 1 } 100% { opacity: 0; transform: translateY(-10px); } }
-        @keyframes shine { 0%, 100% { box-shadow: 0 0 10px var(--lendario); } 50% { box-shadow: 0 0 25px var(--lendario); } }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>DINO EMPIRE: HARDCORE</title>
+<style>
+:root{--comum:#95a5a6;--incomum:#27ae60;--raro:#2980b9;--super:#8e44ad;--lendario:#f39c12;--hibrido:#e74c3c;--ceno:#00cec9;--n:#00d4ff;--bg:#0b0f19}
+*{box-sizing:border-box;font-family:Segoe UI,sans-serif;user-select:none;outline:none;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--bg);color:#ecf0f1;height:100vh;overflow:hidden;touch-action:none;font-size:12px}
+h1,h2,.v,.btn{font-family:'Arial Black',sans-serif;letter-spacing:-0.5px}
+#hud{display:grid;grid-template-columns:repeat(4,1fr);background:rgba(11,15,25,.95);padding:10px;position:fixed;width:100%;top:0;z-index:1000;border-bottom:2px solid #333;box-shadow:0 5px 20px rgba(0,0,0,.8)}
+.v{font-size:12px;color:#fff;display:block;margin-top:2px}
+.l{font-size:9px;color:#7f8c8d;font-weight:700;display:block}
+#viewport{width:100vw;height:100vh;position:relative;overflow:hidden}
+#map{position:absolute;width:6000px;height:6000px;transform-origin:0 0;will-change:transform}
+.map-normal{background:#1a1a1a;background-image:radial-gradient(#333 1px,transparent 1px);background-size:40px 40px}
+.map-ceno{background:#182C36;background-image:radial-gradient(#607D8B 1px,transparent 1px);background-size:40px 40px}
+.entity{position:absolute;transform:translate(-50%,-50%);z-index:10;cursor:pointer}
+.entity:active{transform:translate(-50%,-50%) scale(.95)}
+.cage{width:80px;height:80px;border:2px solid #555;border-radius:12px;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;position:relative;backdrop-filter:blur(4px);transition:border-color .3s}
+.income-tag{position:absolute;bottom:-18px;background:#000;color:#2ecc71;padding:2px 4px;border-radius:3px;font-size:8px;font-weight:700;border:1px solid #333;white-space:nowrap}
+.lvl-badge{position:absolute;top:-8px;background:#fff;color:#000;padding:1px 6px;border-radius:8px;font-size:7px;font-weight:900;border:1px solid #000}
+.dino-emoji{font-size:35px;filter:drop-shadow(0 4px 2px rgba(0,0,0,.5))}
+.placement-guide{position:absolute;width:100px;height:100px;border:2px dashed #fff;border-radius:50%;transform:translate(-50%,-50%);background:rgba(255,255,255,.1);pointer-events:none;z-index:5}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.9);padding:20px;display:none;z-index:5000;overflow-y:auto}
+.m-card{background:#2c3e50;border:1px solid #444;border-radius:12px;padding:15px;max-width:500px;margin:auto;box-shadow:0 0 40px rgba(0,0,0,.8);color:#ecf0f1}
+.m-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;border-bottom:1px solid rgba(255,255,255,.1);padding-bottom:10px}
+h2{margin:0;font-size:16px;color:var(--n)}
+.btn{background:#34495e;color:#fff;border:none;padding:12px;border-radius:6px;width:100%;margin:5px 0;font-weight:700;cursor:pointer;text-transform:uppercase;font-size:10px;transition:.2s;box-shadow:0 3px 0 rgba(0,0,0,.3)}
+.btn:active{transform:translateY(3px);box-shadow:none}
+.btn-close{background:#c0392b;margin-top:15px}
+#idx-list{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;max-height:50vh;overflow-y:auto;padding:5px}
+.idx-card{background:rgba(0,0,0,.3);border-radius:8px;padding:8px;display:flex;flex-direction:column;align-items:center;border:1px solid #444;position:relative;min-height:70px;justify-content:center}
+.idx-emoji{font-size:24px}
+.idx-name{font-size:7px;text-align:center;color:#bdc3c7;margin-top:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;width:100%}
+.idx-locked{opacity:.3;filter:grayscale(1)}
+.idx-locked::after{content:"🔒";position:absolute;font-size:14px}
+.inv-row{display:flex;gap:8px;margin-bottom:8px;align-items:center;background:rgba(0,0,0,.2);padding:5px;border-radius:6px;border-left:3px solid #555}
+.btn-sell-inv{background:#c0392b!important;width:60px!important}
+nav{position:fixed;bottom:0;width:100%;height:70px;background:#151820;border-top:1px solid #333;display:flex;z-index:1000;padding-bottom:10px}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:8px;color:#7f8c8d;cursor:pointer}
+.nav-item span{font-size:20px;margin-bottom:4px}
+.nav-item:active{background:#222;color:#fff}
+#panel{position:fixed;bottom:80px;left:5%;width:90%;background:#2c3e50;border:1px solid #fff;border-radius:12px;padding:15px;display:none;z-index:2000;box-shadow:0 0 50px #000}
+#log{position:fixed;bottom:90px;left:10px;pointer-events:none;z-index:4000;width:80%}
+.log-msg{background:rgba(0,0,0,.8);color:#fff;padding:4px 10px;border-radius:4px;margin-top:4px;font-size:10px;border-left:3px solid var(--n);animation:fadeOut 3s forwards}
+.rar-comum{border-color:var(--comum);box-shadow:0 0 5px var(--comum)}
+.rar-incomum{border-color:var(--incomum);box-shadow:0 0 8px var(--incomum)}
+.rar-raro{border-color:var(--raro);box-shadow:0 0 10px var(--raro)}
+.rar-super{border-color:var(--super);box-shadow:0 0 15px var(--super);border-width:3px}
+.rar-lendario{border-color:var(--lendario);box-shadow:0 0 20px var(--lendario);border-width:3px;animation:shine 2s infinite}
+.rar-hibrido{border-color:var(--hibrido);box-shadow:0 0 25px var(--hibrido)}
+.rar-ceno{border-color:var(--ceno);box-shadow:0 0 10px var(--ceno)}
+#btn-confirm{position:fixed;bottom:100px;left:50%;transform:translateX(-50%);width:200px;display:none;z-index:4000;background:#27ae60;border:2px solid #fff}
+@keyframes fadeOut{0%,80%{opacity:1}100%{opacity:0;transform:translateY(-10px)}}
+@keyframes shine{0%,100%{box-shadow:0 0 10px var(--lendario)}50%{box-shadow:0 0 25px var(--lendario)}}
+</style>
 </head>
 <body>
 
-<!-- Área de logs temporários -->
 <div id="log"></div>
 
-<!-- HUD superior -->
 <div id="hud">
-    <div>
-        <span class="l">DINHEIRO</span>
-        <span id="v-cash" class="v" style="color:#f1c40f">$0</span>
-    </div>
-    <div>
-        <span class="l">CARNE</span>
-        <span id="v-food" class="v" style="color:#e67e22">0</span>
-    </div>
-    <div>
-        <span class="l">C-DNA</span>
-        <span id="v-ceno" class="v" style="color:var(--ceno)">0</span>
-    </div>
-    <div id="btn-map-toggle" onclick="switchWorld()">
-        <span class="l">MAPA</span>
-        <span id="v-world" class="v">JURÁSSICO</span>
-    </div>
+  <div><span class="l">DINHEIRO</span><span id="v-cash" class="v" style="color:#f1c40f">$0</span></div>
+  <div><span class="l">CARNE</span><span id="v-food" class="v" style="color:#e67e22">0</span></div>
+  <div><span class="l">C-DNA</span><span id="v-ceno" class="v" style="color:var(--ceno)">0</span></div>
+  <div id="btn-map-toggle" onclick="switchWorld()"><span class="l">MAPA</span><span id="v-world" class="v">JURÁSSICO</span></div>
 </div>
 
-<!-- Área principal do mapa -->
 <div id="viewport">
-    <div id="map" class="map-normal">
-        <div id="placement-indicator" class="placement-guide" style="display:none"></div>
-        <div id="entities-layer"></div>
-    </div>
+  <div id="map" class="map-normal">
+    <div id="placement-indicator" class="placement-guide" style="display:none"></div>
+    <div id="entities-layer"></div>
+  </div>
 </div>
 
-<!-- Botão de confirmar posicionamento -->
 <button id="btn-confirm" class="btn" onclick="confirmPlacement()">POSICIONAR ✅</button>
 
-<!-- MODAL: LOJA -->
-<div id="modal-shop" class="modal">
-    <div class="m-card">
-        <div class="m-header">
-            <h2>MERCADO NEGRO</h2>
-            <span onclick="closeModals()">✖</span>
-        </div>
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px">
-            <button class="btn" onclick="buy('herb', 5000)">
-                🌿 PACOTE BÁSICO<br>
-                <span style="color:#aaa; font-size:9px">TIER 1 (Herb)</span><br>
-                <span style="color:#f1c40f">$5,000</span>
-            </button>
-            <button class="btn" onclick="buy('carn', 15000)">
-                🥩 PACOTE CAÇADOR<br>
-                <span style="color:#aaa; font-size:9px">TIER 2 (Carn)</span><br>
-                <span style="color:#f1c40f">$15,000</span>
-            </button>
-            <button class="btn" onclick="buy('fly', 45000)">
-                🦅 PACOTE AÉREO<br>
-                <span style="color:#aaa; font-size:9px">TIER 3 (Fly)</span><br>
-                <span style="color:#f1c40f">$45,000</span>
-            </button>
-            <button class="btn" onclick="buy('wat', 100000)">
-                🦈 PACOTE ABISSAL<br>
-                <span style="color:#aaa; font-size:9px">TIER 4 (Elite)</span><br>
-                <span style="color:#f1c40f">$100,000</span>
-            </button>
-        </div>
-        <div style="background:rgba(0,0,0,0.3); padding:10px; margin-top:10px; border-radius:6px; font-size:9px; color:#aaa">
-            ℹ️ Pacotes mais caros têm chances muito maiores de <b style="color:var(--super)">Super Raros</b> e <b style="color:var(--lendario)">Lendários</b>.
-        </div>
-        <button class="btn" style="background:var(--ceno); margin-top:10px; color:#000" onclick="buy('ceno', 0)">
-            🧬 OVO CENOZÓICO (1 C-DNA)
-        </button>
-    </div>
+<div id="modal-shop" class="modal"><div class="m-card">
+<div class="m-header"><h2>MERCADO NEGRO</h2><span onclick="closeModals()">✖</span></div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+  <button class="btn" onclick="buy('herb',5000)">🌿 BÁSICO $5k</button>
+  <button class="btn" onclick="buy('carn',15000)">🥩 CAÇADOR $15k</button>
+  <button class="btn" onclick="buy('fly',45000)">🦅 AÉREO $45k</button>
+  <button class="btn" onclick="buy('wat',100000)">🦈 ABISSAL $100k</button>
 </div>
+<div style="background:rgba(0,0,0,.3);padding:10px;margin-top:10px;border-radius:6px;font-size:9px;color:#aaa">Pacotes caros = mais chance de Super/Lendário</div>
+<button class="btn" style="background:var(--ceno);margin-top:10px;color:#000" onclick="buy('ceno',0)">🧬 CENO (1 C-DNA)</button>
+</div></div>
 
-<!-- MODAL: LABORATÓRIO (FUSÃO) -->
-<div id="modal-lab" class="modal">
-    <div class="m-card">
-        <div class="m-header">
-            <h2>ENGENHARIA GENÉTICA</h2>
-            <span onclick="closeModals()">✖</span>
-        </div>
-        <p style="font-size:10px; color:#aaa; margin-bottom:10px">Funda dinossauros de nível 30+ para criar monstros.</p>
-        
-        <div style="border:1px solid var(--hibrido); padding:10px; border-radius:8px; margin-bottom:10px">
-            <b style="color:var(--hibrido)">INDOMINUS REX</b> <small style="float:right">$500K</small><br>
-            <span style="font-size:9px">T-Rex (Lvl 30) + Raptor (Lvl 30)</span>
-            <button class="btn" style="margin-top:5px; background:rgba(231, 76, 60, 0.3)" onclick="fuse('Indominus Rex')">FUNDIR</button>
-        </div>
-        
-        <div style="border:1px solid var(--hibrido); padding:10px; border-radius:8px">
-            <b style="color:var(--hibrido)">INDORAPTOR</b> <small style="float:right">$2M</small><br>
-            <span style="font-size:9px">Indominus (Lvl 30) + Raptor (Lvl 30)</span>
-            <button class="btn" style="margin-top:5px; background:rgba(231, 76, 60, 0.3)" onclick="fuse('Indoraptor')">FUNDIR</button>
-        </div>
-    </div>
+<div id="modal-lab" class="modal"><div class="m-card">
+<div class="m-header"><h2>ENGENHARIA GENÉTICA</h2><span onclick="closeModals()">✖</span></div>
+<div style="border:1px solid var(--hibrido);padding:10px;border-radius:8px;margin-bottom:10px">
+  <b style="color:var(--hibrido)">INDOMINUS REX</b> <small style="float:right">$500K</small><br>
+  <span style="font-size:9px">T-Rex Lv30 + Raptor Lv30</span>
+  <button class="btn" style="margin-top:5px;background:rgba(231,76,60,.3)" onclick="fuse('Indominus Rex')">FUNDIR</button>
 </div>
-
-<!-- MODAL: EXPEDIÇÃO -->
-<div id="modal-exp" class="modal">
-    <div class="m-card">
-        <div class="m-header">
-            <h2>EXPEDIÇÃO ÁRTICA</h2>
-            <span onclick="closeModals()">✖</span>
-        </div>
-        <div style="text-align:center; padding:20px 0">
-            <div style="font-size:40px">🚁</div>
-            <p>Enviar equipe para recuperar DNA Congelado.</p>
-            <p style="color:var(--lendario); font-weight:bold">$75,000</p>
-            <button id="exp-btn" class="btn" style="background:#27ae60" onclick="startExp(60, 75000)">INICIAR (60s)</button>
-        </div>
-        <p id="exp-timer" style="text-align:center; font-weight:bold; color:#f39c12"></p>
-    </div>
+<div style="border:1px solid var(--hibrido);padding:10px;border-radius:8px">
+  <b style="color:var(--hibrido)">INDORAPTOR</b> <small style="float:right">$2M</small><br>
+  <span style="font-size:9px">Indominus Lv30 + Raptor Lv30</span>
+  <button class="btn" style="margin-top:5px;background:rgba(231,76,60,.3)" onclick="fuse('Indoraptor')">FUNDIR</button>
 </div>
+</div></div>
 
-<!-- MODAL: DINOPÉDIA -->
-<div id="modal-index" class="modal">
-    <div class="m-card">
-        <div class="m-header">
-            <h2>DINOPÉDIA</h2>
-            <span onclick="closeModals()">✖</span>
-        </div>
-        <div id="idx-list"></div>
-        <button class="btn btn-close" onclick="closeModals()">FECHAR</button>
-    </div>
+<div id="modal-exp" class="modal"><div class="m-card">
+<div class="m-header"><h2>EXPEDIÇÃO ÁRTICA</h2><span onclick="closeModals()">✖</span></div>
+<div style="text-align:center;padding:20px 0">
+  <div style="font-size:40px">🚁</div><p>Recuperar DNA Congelado</p>
+  <p style="color:var(--lendario);font-weight:700">$75,000</p>
+  <button id="exp-btn" class="btn" style="background:#27ae60" onclick="startExp(60,75000)">INICIAR (60s)</button>
 </div>
+<p id="exp-timer" style="text-align:center;font-weight:700;color:#f39c12"></p>
+</div></div>
 
-<!-- MODAL: INVENTÁRIO -->
-<div id="modal-inv" class="modal">
-    <div class="m-card">
-        <div class="m-header">
-            <h2>INVENTÁRIO</h2>
-            <span onclick="closeModals()">✖</span>
-        </div>
-        <div id="inv-grid" style="max-height:300px; overflow-y:auto"></div>
-        <button class="btn btn-close" onclick="closeModals()">FECHAR</button>
-    </div>
-</div>
+<div id="modal-index" class="modal"><div class="m-card">
+<div class="m-header"><h2>DINOPÉDIA</h2><span onclick="closeModals()">✖</span></div>
+<div id="idx-list"></div>
+<button class="btn btn-close" onclick="closeModals()">FECHAR</button>
+</div></div>
 
-<!-- Painel lateral do dino selecionado -->
+<div id="modal-inv" class="modal"><div class="m-card">
+<div class="m-header"><h2>INVENTÁRIO</h2><span onclick="closeModals()">✖</span></div>
+<div id="inv-grid" style="max-height:300px;overflow-y:auto"></div>
+<button class="btn btn-close" onclick="closeModals()">FECHAR</button>
+</div></div>
+
 <div id="panel">
-    <div style="display:flex; justify-content:space-between">
-        <h2 id="p-name" style="color:#fff"></h2>
-        <span id="p-rar" style="font-size:9px; padding:3px; border-radius:4px; height:fit-content"></span>
-    </div>
-    <div id="p-stats" style="margin:15px 0; font-size:11px; color:#bdc3c7; display:grid; grid-template-columns:1fr 1fr; gap:10px"></div>
-    <button class="btn" style="background:#e67e22" onclick="upgradeDino()">🥩 ALIMENTAR ($<span id="p-cost"></span>)</button>
-    <div style="display:grid; grid-template-columns:1fr 1fr; gap:5px">
-        <button class="btn" style="background:#2980b9" onclick="initMove()">MOVER</button>
-        <button class="btn" style="background:#c0392b" onclick="sellDino()">VENDER</button>
-    </div>
-    <button class="btn" style="background:#34495e; margin-top:10px" onclick="closePanel()">VOLTAR</button>
+  <div style="display:flex;justify-content:space-between">
+    <h2 id="p-name" style="color:#fff"></h2>
+    <span id="p-rar" style="font-size:9px;padding:3px;border-radius:4px"></span>
+  </div>
+  <div id="p-stats" style="margin:15px 0;font-size:11px;color:#bdc3c7;display:grid;grid-template-columns:1fr 1fr;gap:10px"></div>
+  <button class="btn" style="background:#e67e22" onclick="upgradeDino()">🥩 ALIMENTAR ($<span id="p-cost"></span>)</button>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px">
+    <button class="btn" style="background:#2980b9" onclick="initMove()">MOVER</button>
+    <button class="btn" style="background:#c0392b" onclick="sellDino()">VENDER</button>
+  </div>
+  <button class="btn" style="background:#34495e;margin-top:10px" onclick="closePanel()">VOLTAR</button>
 </div>
 
-<!-- Navegação inferior -->
 <nav>
-    <div class="nav-item" onclick="openModal('shop')"><span>🛒</span>LOJA</div>
-    <div class="nav-item" onclick="openModal('lab')"><span>🧬</span>LAB</div>
-    <div class="nav-item" onclick="openModal('exp')"><span>🚁</span>EXPED</div>
-    <div class="nav-item" onclick="openIndex()"><span>📖</span>INDEX</div>
-    <div class="nav-item" onclick="openModal('inv')"><span>📦</span>INV</div>
-    <div class="nav-item" id="btn-food">
-        <span>🥩</span>
-        <div id="farm-combo" style="font-size:9px; font-weight:bold; opacity:0; margin-top:1px;">×1</div>
-        FARM
-    </div>
+  <div class="nav-item" onclick="openModal('shop')"><span>🛒</span>LOJA</div>
+  <div class="nav-item" onclick="openModal('lab')"><span>🧬</span>LAB</div>
+  <div class="nav-item" onclick="openModal('exp')"><span>🚁</span>EXPED</div>
+  <div class="nav-item" onclick="openIndex()"><span>📖</span>INDEX</div>
+  <div class="nav-item" onclick="openModal('inv')"><span>📦</span>INV</div>
+  <div class="nav-item" id="btn-food">
+    <span>🥩</span>
+    <div id="farm-combo" style="font-size:9px;font-weight:700;opacity:0;margin-top:1px">×1</div>
+    FARM
+  </div>
 </nav>
 
-<!-- SCRIPT PRINCIPAL -->
 <script>
 // ============================================================================
-//  DADOS DO JOGO (DINOS E RARIDADES)
+// DADOS
 // ============================================================================
 const DATA = {
-    carn: [
-        {n:"Compy", e:"🦎"}, {n:"Dilopho", e:"🐍"}, {n:"Raptor", e:"🦖"},
-        {n:"Carnotauro", e:"🐂"}, {n:"Allosaurus", e:"🐊"}, {n:"T-Rex", e:"🦖"},
-        {n:"Spino", e:"🦈"}, {n:"Giga", e:"🐲"}
-    ],
-    herb: [
-        {n:"Galli", e:"🦤"}, {n:"Pachy", e:"🐐"}, {n:"Para", e:"🎷"},
-        {n:"Ankylo", e:"🐢"}, {n:"Stego", e:"🛡️"}, {n:"Trike", e:"🚜"},
-        {n:"Brachio", e:"🦕"}, {n:"Titan", e:"🏚️"}
-    ],
-    fly: [
-        {n:"Dimorph", e:"🦇"}, {n:"Pteranodon", e:"🦅"},
-        {n:"Tapejara", e:"🦜"}, {n:"Quetzal", e:"✈️"}
-    ],
-    wat: [
-        {n:"Ichthyo", e:"🐟"}, {n:"Plesio", e:"🦕"},
-        {n:"Mosasaurus", e:"🦈"}, {n:"Megalodon", e:"🦷"}
-    ],
-    ceno: [
-        {n:"Dodo", e:"🦤"}, {n:"Smilodon", e:"🐅"},
-        {n:"Mamute", e:"🦣"}, {n:"Preguiça", e:"🦥"}
-    ],
-    hibrido: [
-        {n:"Indominus Rex", e:"🧬"}, {n:"Indoraptor", e:"🌑"}
-    ]
+  carn: [{n:"Compy",e:"🦎"},{n:"Dilopho",e:"🐍"},{n:"Raptor",e:"🦖"},{n:"Carnotauro",e:"🐂"},{n:"Allosaurus",e:"🐊"},{n:"T-Rex",e:"🦖"},{n:"Spino",e:"🦈"},{n:"Giga",e:"🐲"}],
+  herb: [{n:"Galli",e:"🦤"},{n:"Pachy",e:"🐐"},{n:"Para",e:"🎷"},{n:"Ankylo",e:"🐢"},{n:"Stego",e:"🛡️"},{n:"Trike",e:"🚜"},{n:"Brachio",e:"🦕"},{n:"Titan",e:"🏚️"}],
+  fly: [{n:"Dimorph",e:"🦇"},{n:"Pteranodon",e:"🦅"},{n:"Tapejara",e:"🦜"},{n:"Quetzal",e:"✈️"}],
+  wat: [{n:"Ichthyo",e:"🐟"},{n:"Plesio",e:"🦕"},{n:"Mosasaurus",e:"🦈"},{n:"Megalodon",e:"🦷"}],
+  ceno: [{n:"Dodo",e:"🦤"},{n:"Smilodon",e:"🐅"},{n:"Mamute",e:"🦣"},{n:"Preguiça",e:"🦥"}],
+  hibrido: [{n:"Indominus Rex",e:"🧬"},{n:"Indoraptor",e:"🌑"}]
 };
 
 const RARITY = {
-    comum:    { color: '#95a5a6', name: 'COMUM',    mult: 1   },
-    incomum:  { color: '#27ae60', name: 'INCOMUM',  mult: 1.5 },
-    raro:     { color: '#2980b9', name: 'RARO',     mult: 3   },
-    super:    { color: '#8e44ad', name: 'SUPER',    mult: 6   },
-    lendario: { color: '#f39c12', name: 'LENDÁRIO', mult: 15  },
-    hibrido:  { color: '#e74c3c', name: 'HÍBRIDO',  mult: 40  },
-    ceno:     { color: '#00cec9', name: 'CENOZÓICO',mult: 8   }
+  comum:    {color:"#95a5a6",name:"COMUM",   mult:1},
+  incomum:  {color:"#27ae60",name:"INCOMUM", mult:1.5},
+  raro:     {color:"#2980b9",name:"RARO",    mult:3},
+  super:    {color:"#8e44ad",name:"SUPER",   mult:6},
+  lendario: {color:"#f39c12",name:"LENDÁRIO",mult:15},
+  hibrido:  {color:"#e74c3c",name:"HÍBRIDO", mult:40},
+  ceno:     {color:"#00cec9",name:"CENOZÓICO",mult:8}
 };
 
-// ============================================================================
-//  ESTADO DO JOGO (VALORES INICIAIS)
-// ============================================================================
 let state = {
-    cash: 15000,
-    food: 1000,
-    cenoDNA: 0,
-    dinos: [],
-    inv: [],
-    discovered: [],
-    expEnd: 0,
-    world: 'normal',
-    cam: { x: -2900, y: -2900 },
-    placing: null,
-    selected: null
+  cash: 15000,
+  food: 1000,
+  cenoDNA: 0,
+  dinos: [],
+  inv: [],
+  discovered: [],
+  expEnd: 0,
+  world: "normal",
+  cam: {x:-2900,y:-2900},
+  placing: null,
+  selected: null
 };
 
-// ============================================================================
-//  FARM DE COMIDA (AJUSTADO PARA ×200 EM \~10 SEGUNDOS)
-// ============================================================================
 let farmInterval = null;
 let farmStartTime = 0;
 let farmMultiplier = 1;
 
-const btnFood = document.getElementById('btn-food');
-const comboEl = document.getElementById('farm-combo');
+const btnFood = document.getElementById("btn-food");
+const comboEl = document.getElementById("farm-combo");
 
 function startFarm(e) {
-    e.preventDefault();
-    e.stopPropagation();
+  e.preventDefault();
+  e.stopPropagation();
+  if (farmInterval) return;
+  farmStartTime = Date.now();
+  farmMultiplier = 1;
+  comboEl.style.opacity = "1";
+  comboEl.innerText = "×1";
+  comboEl.style.color = "#2ecc71";
 
-    if (farmInterval) return;
+  farmInterval = setInterval(() => {
+    if (state.cash < 20) {
+      stopFarm();
+      addLog("Sem dinheiro!");
+      return;
+    }
 
-    farmStartTime = Date.now();
-    farmMultiplier = 1;
-    comboEl.style.opacity = '1';
-    comboEl.innerText = '×1';
-    comboEl.style.color = '#2ecc71';
+    const seconds = (Date.now() - farmStartTime) / 1000;
+    farmMultiplier = Math.min(200, 1 + Math.floor(seconds * 19.9));
 
-    farmInterval = setInterval(() => {
-        if (state.cash < 20) {
-            stopFarm();
-            addLog("Sem dinheiro para continuar!");
-            return;
-        }
+    const foodPerTick = Math.floor(15 * farmMultiplier);
+    state.cash -= 20;
+    state.food += foodPerTick;
 
-        // Tempo em segundos
-        const seconds = (Date.now() - farmStartTime) / 1000;
+    comboEl.innerText = `×${farmMultiplier}`;
+    comboEl.style.color = farmMultiplier >= 150 ? "#c0392b" :
+                         farmMultiplier >= 100 ? "#e74c3c" :
+                         farmMultiplier >= 50  ? "#f39c12" :
+                         farmMultiplier >= 20  ? "#f1c40f" : "#2ecc71";
 
-        // Chega em ×200 em cerca de 10 segundos
-        // 200 - 1 = 199 → 199 / 10s = \~19.9 por segundo
-        farmMultiplier = Math.min(200, 1 + Math.floor(seconds * 19.9));
-
-        const foodPerTick = Math.floor(15 * farmMultiplier);
-        const costPerTick = 20;
-
-        state.cash -= costPerTick;
-        state.food += foodPerTick;
-
-        // Atualiza visual do multiplicador
-        comboEl.innerText = `×${farmMultiplier}`;
-        comboEl.style.color = 
-            farmMultiplier >= 150 ? '#c0392b' :
-            farmMultiplier >= 100 ? '#e74c3c' :
-            farmMultiplier >= 50  ? '#f39c12' :
-            farmMultiplier >= 20  ? '#f1c40f' : '#2ecc71';
-
-        updateHUD();
-    }, 80); // ≈ 12.5 ticks por segundo
+    updateHUD();
+  }, 80);
 }
 
 function stopFarm(e) {
-    if (e) {
-        e.preventDefault();
-        e.stopPropagation();
-    }
-    if (farmInterval) {
-        clearInterval(farmInterval);
-        farmInterval = null;
-        comboEl.style.opacity = '0';
-        farmMultiplier = 1;
-    }
+  if (e) { e.preventDefault(); e.stopPropagation(); }
+  clearInterval(farmInterval);
+  farmInterval = null;
+  comboEl.style.opacity = "0";
+  farmMultiplier = 1;
 }
 
-// Eventos touch e pointer para funcionar no celular e PC
-btnFood.addEventListener('pointerdown', startFarm, { passive: false });
-btnFood.addEventListener('pointerup', stopFarm);
-btnFood.addEventListener('pointerleave', stopFarm);
-btnFood.addEventListener('pointercancel', stopFarm);
+btnFood.addEventListener("pointerdown", startFarm, {passive:false});
+btnFood.addEventListener("pointerup", stopFarm);
+btnFood.addEventListener("pointerleave", stopFarm);
+btnFood.addEventListener("pointercancel", stopFarm);
+btnFood.addEventListener("touchstart", startFarm, {passive:false});
+btnFood.addEventListener("touchend", stopFarm);
+btnFood.addEventListener("touchcancel", stopFarm);
 
-btnFood.addEventListener('touchstart', startFarm, { passive: false });
-btnFood.addEventListener('touchend', stopFarm);
-btnFood.addEventListener('touchcancel', stopFarm);
-
-// ============================================================================
-//  LOOP PRINCIPAL DO JOGO
-// ============================================================================
 function tick() {
-    let totalIncome = 0;
+  let total = 0;
+  state.dinos.forEach(d => {
+    const mult = RARITY[d.rar]?.mult || 1;
+    const lvl = Number(d.lvl) || 1;
+    const base = d.cat === "ceno" ? 8 : 2;
+    const inc = (base * mult * lvl) * 0.4;
+    total += inc;
+    d.lastInc = inc * 10;
+  });
+  state.cash += total;
 
-    state.dinos.forEach(dino => {
-        const rarityMult = RARITY[dino.rar]?.mult || 1;
-        const level = Number(dino.lvl) || 1;
-        const baseIncome = dino.cat === 'ceno' ? 8 : 2;
-        const income = (baseIncome * rarityMult * level) * 0.4;
-        totalIncome += income;
-        dino.lastInc = income * 10; // valor aproximado por segundo
-    });
+  if (state.expEnd > Date.now()) {
+    let s = Math.ceil((state.expEnd - Date.now()) / 1000);
+    document.getElementById("exp-timer").innerText = `${s}s`;
+    document.getElementById("exp-btn").disabled = true;
+    document.getElementById("exp-btn").style.opacity = 0.5;
+  } else {
+    if (state.expEnd !== 0) finishExp();
+    document.getElementById("exp-timer").innerText = "";
+    document.getElementById("exp-btn").disabled = false;
+    document.getElementById("exp-btn").style.opacity = 1;
+  }
 
-    state.cash += totalIncome;
-
-    // Expedição
-    if (state.expEnd > Date.now()) {
-        const secondsLeft = Math.ceil((state.expEnd - Date.now()) / 1000);
-        document.getElementById('exp-timer').innerText = `${secondsLeft}s`;
-        document.getElementById('exp-btn').disabled = true;
-        document.getElementById('exp-btn').style.opacity = 0.5;
-    } else {
-        if (state.expEnd !== 0) finishExp();
-        document.getElementById('exp-timer').innerText = "";
-        document.getElementById('exp-btn').disabled = false;
-        document.getElementById('exp-btn').style.opacity = 1;
-    }
-
-    updateHUD();
+  updateHUD();
 }
 
-// ============================================================================
-//  ATUALIZAÇÃO DA INTERFACE (HUD)
-// ============================================================================
 function updateHUD() {
-    document.getElementById('v-cash').innerText = "$" + abb(state.cash);
-    document.getElementById('v-food').innerText = abb(state.food);
-    document.getElementById('v-ceno').innerText = state.cenoDNA || 0;
+  document.getElementById("v-cash").innerText = "$" + abb(state.cash);
+  document.getElementById("v-food").innerText = abb(state.food);
+  document.getElementById("v-ceno").innerText = state.cenoDNA || 0;
 
-    state.dinos.forEach((dino, index) => {
-        if (dino.world !== state.world) return;
-        const element = document.getElementById(`inc-${index}`);
-        if (element) {
-            element.innerText = `+\[ {abb(dino.lastInc || 0)}/s`;
-        }
-    });
+  state.dinos.forEach((d, i) => {
+    if (d.world !== state.world) return;
+    const el = document.getElementById(`inc-${i}`);
+    if (el) el.innerText = `+\[ {abb(d.lastInc || 0)}/s`;
+  });
 }
 
-// ============================================================================
-//  FORMATAÇÃO DE NÚMEROS GRANDES (K, M, B, T)
-// ============================================================================
-function abb(value) {
-    if (typeof value !== 'number' || isNaN(value) || value == null) {
-        return "0";
-    }
-
-    value = Number(value);
-
-    if (value >= 1e12) return (value / 1e12).toFixed(1).replace(/\.0$/, '') + 'T';
-    if (value >= 1e9)  return (value / 1e9 ).toFixed(1).replace(/\.0$/, '') + 'B';
-    if (value >= 1e6)  return (value / 1e6 ).toFixed(1).replace(/\.0$/, '') + 'M';
-    if (value >= 1e3)  return Math.floor(value / 1000) + 'K';
-    return Math.floor(value);
+function abb(n) {
+  if (typeof n !== "number" || isNaN(n) || n == null) return "0";
+  n = Number(n);
+  if (n >= 1e12) return (n/1e12).toFixed(1).replace(/\.0$/,"") + "T";
+  if (n >= 1e9)  return (n/1e9).toFixed(1).replace(/\.0$/,"") + "B";
+  if (n >= 1e6)  return (n/1e6).toFixed(1).replace(/\.0$/,"") + "M";
+  if (n >= 1e3)  return Math.floor(n/1000) + "K";
+  return Math.floor(n);
 }
 
-// ============================================================================
-//  COMPRAR PACOTES (GACHA)
-// ============================================================================
-function buy(category, price) {
-    if (category === 'ceno') {
-        if (state.cenoDNA < 1) return alert("Precisa de DNA Cenozóico!");
-        state.cenoDNA--;
-    } else {
-        if (state.cash < price) return alert("Dinheiro insuficiente!");
-        state.cash -= price;
-    }
+function buy(cat, price) {
+  if (cat === "ceno") {
+    if (state.cenoDNA < 1) return alert("Precisa de C-DNA!");
+    state.cenoDNA--;
+  } else {
+    if (state.cash < price) return alert("Dinheiro insuficiente!");
+    state.cash -= price;
+  }
 
-    const dinosaur = generateDino(category);
-    state.inv.push(dinosaur);
-    addLog(`📦 \( {dinosaur.name} ( \){RARITY[dinosaur.rar]?.name || "???"}) adquirido!`);
-    openModal('inv');
-    save();
+  let dino = generateDino(cat);
+  state.inv.push(dino);
+  addLog(`📦 \( {dino.name} ( \){RARITY[dino.rar]?.name || "???"})`);
+  openModal("inv");
+  save();
 }
 
-// ============================================================================
-//  GERAR DINOS ALEATÓRIOS
-// ============================================================================
-function generateDino(category) {
-    const pool = DATA[category] || DATA.carn;
-    const selected = pool[Math.floor(Math.random() * pool.length)];
+function generateDino(cat) {
+  const pool = DATA[cat] || DATA.carn;
+  let obj = pool[Math.floor(Math.random()*pool.length)];
 
-    let rand = Math.random() * 100;
-    let rarity = 'comum';
+  let rnd = Math.random()*100;
+  let rar = "comum";
 
-    if (category === 'ceno') rarity = 'ceno';
-    else if (category === 'herb') {
-        if (rand < 70) rarity = 'comum';
-        else if (rand < 95) rarity = 'incomum';
-        else if (rand < 99) rarity = 'raro';
-        else rarity = 'super';
-    }
-    else if (category === 'carn') {
-        if (rand < 50) rarity = 'comum';
-        else if (rand < 80) rarity = 'incomum';
-        else if (rand < 95) rarity = 'raro';
-        else if (rand < 99) rarity = 'super';
-        else rarity = 'lendario';
-    }
-    else if (category === 'fly') {
-        if (rand < 30) rarity = 'comum';
-        else if (rand < 60) rarity = 'incomum';
-        else if (rand < 85) rarity = 'raro';
-        else if (rand < 97) rarity = 'super';
-        else rarity = 'lendario';
-    }
-    else if (category === 'wat') {
-        if (rand < 10) rarity = 'comum';
-        else if (rand < 30) rarity = 'incomum';
-        else if (rand < 70) rarity = 'raro';
-        else if (rand < 90) rarity = 'super';
-        else rarity = 'lendario';
-    }
+  if (cat === "ceno") rar = "ceno";
+  else if (cat === "herb") {
+    if (rnd < 70) rar = "comum";
+    else if (rnd < 95) rar = "incomum";
+    else if (rnd < 99) rar = "raro";
+    else rar = "super";
+  } else if (cat === "carn") {
+    if (rnd < 50) rar = "comum";
+    else if (rnd < 80) rar = "incomum";
+    else if (rnd < 95) rar = "raro";
+    else if (rnd < 99) rar = "super";
+    else rar = "lendario";
+  } else if (cat === "fly") {
+    if (rnd < 30) rar = "comum";
+    else if (rnd < 60) rar = "incomum";
+    else if (rnd < 85) rar = "raro";
+    else if (rnd < 97) rar = "super";
+    else rar = "lendario";
+  } else if (cat === "wat") {
+    if (rnd < 10) rar = "comum";
+    else if (rnd < 30) rar = "incomum";
+    else if (rnd < 70) rar = "raro";
+    else if (rnd < 90) rar = "super";
+    else rar = "lendario";
+  }
 
-    if (!state.discovered.includes(selected.n)) {
-        state.discovered.push(selected.n);
-    }
+  if (!state.discovered.includes(obj.n)) state.discovered.push(obj.n);
 
-    return {
-        name: selected.n,
-        img: selected.e,
-        cat: category,
-        rar: rarity,
-        lvl: 1,
-        x: 0,
-        y: 0,
-        world: category === 'ceno' ? 'ceno' : 'normal',
-        lastInc: 0
-    };
+  return {
+    name: obj.n || "Dino Desconhecido",
+    img: obj.e || "?",
+    cat: cat,
+    rar: rar,
+    lvl: 1,
+    x: 0,
+    y: 0,
+    world: cat === "ceno" ? "ceno" : "normal",
+    lastInc: 0
+  };
 }
 
-// ============================================================================
-//  FUSÃO DE DINOS
-// ============================================================================
 function fuse(type) {
-    let reqA = type === "Indominus Rex" ? "T-Rex" : "Indominus Rex";
-    let reqB = "Raptor";
-    let cost = type === "Indominus Rex" ? 500000 : 2000000;
+  let reqA = type === "Indominus Rex" ? "T-Rex" : "Indominus Rex";
+  let cost = type === "Indominus Rex" ? 500000 : 2000000;
 
-    let idxA = state.dinos.findIndex(d => d.name === reqA && d.lvl >= 30);
-    let idxB = state.dinos.findIndex((d, i) => d.name === reqB && d.lvl >= 30 && i !== idxA);
+  let idxA = state.dinos.findIndex(d => d.name === reqA && (d.lvl||0) >= 30);
+  let idxB = state.dinos.findIndex((d,i) => d.name === "Raptor" && (d.lvl||0) >= 30 && i !== idxA);
 
-    if (idxA > -1 && idxB > -1 && state.cash >= cost) {
-        state.cash -= cost;
-        const toRemove = [idxA, idxB].sort((a,b)=>b-a);
-        state.dinos.splice(toRemove[0], 1);
-        state.dinos.splice(toRemove[1], 1);
+  if (idxA > -1 && idxB > -1 && state.cash >= cost) {
+    state.cash -= cost;
+    let rms = [idxA, idxB].sort((a,b)=>b-a);
+    state.dinos.splice(rms[0],1);
+    state.dinos.splice(rms[1],1);
 
-        const hybrid = {
-            name: type,
-            img: type === "Indominus Rex" ? "🧬" : "🌑",
-            cat: 'hibrido',
-            rar: 'hibrido',
-            lvl: 1,
-            x: 0,
-            y: 0,
-            world: 'normal',
-            lastInc: 0
-        };
+    let h = {
+      name: type,
+      img: type === "Indominus Rex" ? "🧬" : "🌑",
+      cat: "hibrido",
+      rar: "hibrido",
+      lvl: 1,
+      x: 0,
+      y: 0,
+      world: "normal",
+      lastInc: 0
+    };
+    state.inv.push(h);
+    if (!state.discovered.includes(type)) state.discovered.push(type);
 
-        state.inv.push(hybrid);
-        if (!state.discovered.includes(type)) state.discovered.push(type);
-
-        addLog(`🧬 ${type} CRIADO COM SUCESSO!`);
-        closeModals();
-        openModal('inv');
-        render();
-        save();
-    } else {
-        alert(`Requisitos: ${reqA} (Lv30) + Raptor (Lv30) + \]{abb(cost)}`);
-    }
-}
-
-// ============================================================================
-//  ABERTURA DE MODAIS
-// ============================================================================
-function openModal(id) {
-    document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
-    document.getElementById('modal-' + id).style.display = 'block';
-
-    if (id === 'inv') {
-        const grid = document.getElementById('inv-grid');
-        grid.innerHTML = '';
-
-        if (state.inv.length === 0) {
-            grid.innerHTML = "<p style='text-align:center;color:#777'>Vazio</p>";
-            return;
-        }
-
-        state.inv.forEach((dino, index) => {
-            const row = document.createElement('div');
-            row.className = 'inv-row rar-' + (dino.rar || 'comum');
-
-            row.innerHTML = `
-                <div style="font-size:20px">${dino.img || "?"}</div>
-                <div style="flex:1">
-                    <div style="font-weight:bold; color:\( {RARITY[dino.rar]?.color || '#fff'}"> \){dino.name || "???"}</div>
-                    <div style="font-size:8px; color:#aaa">${RARITY[dino.rar]?.name || "???"}</div>
-                </div>
-                <button class="btn" style="width:auto; padding:5px 10px" onclick="startPlace(${index})">SOLTAR</button>
-                <button class="btn btn-sell-inv" onclick="sellInv(${index})">\[ {abb(500 * (RARITY[dino.rar]?.mult || 1))}</button>
-            `;
-
-            grid.appendChild(row);
-        });
-    }
-}
-
-// ============================================================================
-//  DINOPÉDIA (INDEX)
-// ============================================================================
-function openIndex() {
-    document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
-    document.getElementById('modal-index').style.display = 'block';
-
-    const list = document.getElementById('idx-list');
-    list.innerHTML = '';
-
-    ['carn', 'herb', 'fly', 'wat', 'ceno', 'hibrido'].forEach(cat => {
-        DATA[cat].forEach(dino => {
-            const unlocked = state.discovered.includes(dino.n);
-            const card = document.createElement('div');
-            card.className = unlocked ? 'idx-card' : 'idx-card idx-locked';
-            card.innerHTML = `<div class="idx-emoji">\( {dino.e}</div><div class="idx-name"> \){dino.n}</div>`;
-            list.appendChild(card);
-        });
-    });
-}
-
-// ============================================================================
-//  VENDER DO INVENTÁRIO
-// ============================================================================
-function sellInv(index) {
-    const dino = state.inv[index];
-    const value = 500 * (RARITY[dino.rar]?.mult || 1);
-    state.cash += value;
-    state.inv.splice(index, 1);
-    openModal('inv');
-    save();
-}
-
-// ============================================================================
-//  POSICIONAR DINO NO MAPA
-// ============================================================================
-function startPlace(index) {
-    state.placing = state.inv.splice(index, 1)[0];
-    state.placing.x = Math.abs(state.cam.x) + (window.innerWidth / 2);
-    state.placing.y = Math.abs(state.cam.y) + (window.innerHeight / 2);
-    document.getElementById('btn-confirm').style.display = 'block';
+    addLog(`🧬 ${type} CRIADO!`);
     closeModals();
+    openModal("inv");
     render();
+    save();
+  } else {
+    alert(`Precisa: ${reqA} Lv30 + Raptor Lv30 + \]{abb(cost)}`);
+  }
+}
+
+function openModal(id) {
+  document.querySelectorAll(".modal").forEach(m => m.style.display = "none");
+  document.getElementById("modal-" + id).style.display = "block";
+
+  if (id === "inv") {
+    const g = document.getElementById("inv-grid");
+    g.innerHTML = "";
+    if (!state.inv.length) {
+      g.innerHTML = "<p style='text-align:center;color:#777'>Vazio</p>";
+      return;
+    }
+
+    state.inv.forEach((d, i) => {
+      let name = d.name || "Dino desconhecido";
+      let emoji = d.img || "?";
+      let rarityName = RARITY[d.rar]?.name || "???";
+      let color = RARITY[d.rar]?.color || "#fff";
+
+      let row = document.createElement("div");
+      row.className = "inv-row rar-" + (d.rar || "comum");
+      row.innerHTML = `
+        <div style="font-size:20px">${emoji}</div>
+        <div style="flex:1">
+          <div style="font-weight:700;color:\( {color}"> \){name}</div>
+          <div style="font-size:8px;color:#aaa">${rarityName}</div>
+        </div>
+        <button class="btn" style="width:auto;padding:5px 10px" onclick="startPlace(${i})">SOLTAR</button>
+        <button class="btn btn-sell-inv" onclick="sellInv(${i})">\[ {abb(500 * (RARITY[d.rar]?.mult || 1))}</button>
+      `;
+      g.appendChild(row);
+    });
+  }
+}
+
+function openIndex() {
+  document.querySelectorAll(".modal").forEach(m => m.style.display = "none");
+  document.getElementById("modal-index").style.display = "block";
+  const l = document.getElementById("idx-list");
+  l.innerHTML = "";
+
+  ["carn","herb","fly","wat","ceno","hibrido"].forEach(cat => {
+    DATA[cat].forEach(d => {
+      let unlocked = state.discovered.includes(d.n);
+      let div = document.createElement("div");
+      div.className = unlocked ? "idx-card" : "idx-card idx-locked";
+      div.innerHTML = `
+        <div class="idx-emoji">${d.e || "?"}</div>
+        <div class="idx-name">${d.n || "Desconhecido"}</div>
+      `;
+      l.appendChild(div);
+    });
+  });
+}
+
+function sellInv(i) {
+  let d = state.inv[i];
+  state.cash += 500 * (RARITY[d.rar]?.mult || 1);
+  state.inv.splice(i, 1);
+  openModal("inv");
+  save();
+}
+
+function startPlace(i) {
+  state.placing = state.inv.splice(i, 1)[0];
+  state.placing.x = Math.abs(state.cam.x) + (window.innerWidth / 2);
+  state.placing.y = Math.abs(state.cam.y) + (window.innerHeight / 2);
+  document.getElementById("btn-confirm").style.display = "block";
+  closeModals();
+  render();
 }
 
 function confirmPlacement() {
-    if (!state.placing) return;
-    state.dinos.push(state.placing);
-    state.placing = null;
-    document.getElementById('btn-confirm').style.display = 'none';
-    render();
-    save();
+  if (!state.placing) return;
+  state.dinos.push(state.placing);
+  state.placing = null;
+  document.getElementById("btn-confirm").style.display = "none";
+  render();
+  save();
 }
 
-// ============================================================================
-//  RENDERIZAR DINOS NO MAPA
-// ============================================================================
 function render() {
-    const layer = document.getElementById('entities-layer');
-    layer.innerHTML = '';
+  const layer = document.getElementById("entities-layer");
+  layer.innerHTML = "";
 
-    state.dinos.forEach((dino, index) => {
-        if (dino.world !== state.world) return;
+  state.dinos.forEach((d, i) => {
+    if (d.world !== state.world) return;
+    let el = document.createElement("div");
+    el.className = "entity";
+    el.style.left = d.x + "px";
+    el.style.top = d.y + "px";
+    el.onclick = () => openPanel(i);
+    el.innerHTML = `
+      <div class="cage rar-${d.rar || "comum"}">
+        <div class="lvl-badge">${d.lvl || 1}</div>
+        <div class="dino-emoji">${d.img || "?"}</div>
+        <div class="income-tag" id="inc-${i}">...</div>
+      </div>
+    `;
+    layer.appendChild(el);
+  });
 
-        const entity = document.createElement('div');
-        entity.className = 'entity';
-        entity.style.left = dino.x + 'px';
-        entity.style.top = dino.y + 'px';
-        entity.onclick = () => openPanel(index);
-
-        entity.innerHTML = `
-            <div class="cage rar-${dino.rar || 'comum'}">
-                <div class="lvl-badge">${dino.lvl || 1}</div>
-                <div class="dino-emoji">${dino.img || "?"}</div>
-                <div class="income-tag" id="inc-${index}">...</div>
-            </div>
-        `;
-
-        layer.appendChild(entity);
-    });
-
-    const indicator = document.getElementById('placement-indicator');
-    if (state.placing) {
-        indicator.style.display = 'block';
-        indicator.style.left = state.placing.x + 'px';
-        indicator.style.top = state.placing.y + 'px';
-    } else {
-        indicator.style.display = 'none';
-    }
+  const pi = document.getElementById("placement-indicator");
+  if (state.placing) {
+    pi.style.display = "block";
+    pi.style.left = state.placing.x + "px";
+    pi.style.top = state.placing.y + "px";
+  } else {
+    pi.style.display = "none";
+  }
 }
 
-// ============================================================================
-//  PAINEL DE INFORMAÇÕES DO DINO
-// ============================================================================
-function openPanel(index) {
-    state.selected = index;
-    const dino = state.dinos[index];
-    const rarity = RARITY[dino.rar] || RARITY.comum;
+function openPanel(i) {
+  state.selected = i;
+  let d = state.dinos[i] || {};
+  let conf = RARITY[d.rar] || RARITY.comum;
 
-    document.getElementById('panel').style.display = 'block';
-    document.getElementById('p-name').innerText = dino.name || "???";
-    document.getElementById('p-rar').innerText = rarity.name;
-    document.getElementById('p-rar').style.background = rarity.color;
-    document.getElementById('p-rar').style.color = (dino.rar === 'comum' || dino.rar === 'lendario') ? '#000' : '#fff';
+  document.getElementById("panel").style.display = "block";
+  document.getElementById("p-name").innerText = d.name || "Desconhecido";
+  document.getElementById("p-rar").innerText = conf.name;
+  document.getElementById("p-rar").style.background = conf.color;
+  document.getElementById("p-rar").style.color = (d.rar === "comum" || d.rar === "lendario") ? "#000" : "#fff";
 
-    const upgradeCost = Math.floor(250 * rarity.mult * Math.pow(1.15, dino.lvl || 1));
-    document.getElementById('p-cost').innerText = abb(upgradeCost);
+  let upCost = Math.floor(250 * conf.mult * Math.pow(1.15, d.lvl || 1));
+  document.getElementById("p-cost").innerText = abb(upCost);
 
-    document.getElementById('p-stats').innerHTML = `
-        <div>Nível: <b style="color:#fff">${dino.lvl || 1}</b></div>
-        <div>Lucro: <b style="color:#2ecc71"> \]{abb(dino.lastInc || 0)}/s</b></div>
-    `;
+  document.getElementById("p-stats").innerHTML = `
+    <div>Nível: <b style="color:#fff">${d.lvl || 1}</b></div>
+    <div>Lucro: <b style="color:#2ecc71"> \]{abb(d.lastInc || 0)}/s</b></div>
+  `;
 }
 
 function upgradeDino() {
-    const dino = state.dinos[state.selected];
-    if (!dino) return;
+  let d = state.dinos[state.selected];
+  if (!d) return;
+  let conf = RARITY[d.rar] || RARITY.comum;
+  let cost = Math.floor(250 * conf.mult * Math.pow(1.15, d.lvl || 1));
 
-    const rarity = RARITY[dino.rar] || RARITY.comum;
-    const cost = Math.floor(250 * rarity.mult * Math.pow(1.15, dino.lvl || 1));
-
-    if (state.food >= cost) {
-        state.food -= cost;
-        dino.lvl = (dino.lvl || 1) + 1;
-        addLog("Nível aumentado! 🥩");
-        openPanel(state.selected);
-        save();
-    } else {
-        addLog("Carne insuficiente!");
-    }
+  if (state.food >= cost) {
+    state.food -= cost;
+    d.lvl = (d.lvl || 1) + 1;
+    addLog("Nível aumentado! 🥩");
+    openPanel(state.selected);
+    save();
+  } else {
+    addLog("Carne insuficiente!");
+  }
 }
 
 function sellDino() {
-    const dino = state.dinos[state.selected];
-    if (!dino) return;
-
-    const value = Math.floor((dino.lvl || 1) * 200 * (RARITY[dino.rar]?.mult || 1));
-
-    if (confirm(`Vender por $${abb(value)}?`)) {
-        state.cash += value;
-        state.dinos.splice(state.selected, 1);
-        closePanel();
-        render();
-        save();
-    }
+  let d = state.dinos[state.selected];
+  if (!d) return;
+  let val = Math.floor((d.lvl || 1) * 200 * (RARITY[d.rar]?.mult || 1));
+  if (confirm(`Vender por $${abb(val)}?`)) {
+    state.cash += val;
+    state.dinos.splice(state.selected, 1);
+    closePanel();
+    render();
+    save();
+  }
 }
 
 function initMove() {
-    state.placing = state.dinos.splice(state.selected, 1)[0];
-    document.getElementById('btn-confirm').style.display = 'block';
-    closePanel();
-    render();
+  state.placing = state.dinos.splice(state.selected, 1)[0];
+  document.getElementById("btn-confirm").style.display = "block";
+  closePanel();
+  render();
 }
 
-// ============================================================================
-//  MOVIMENTO DO MAPA (DRAG)
-// ============================================================================
-let isDragging = false;
-let lastX, lastY;
-const mapElement = document.getElementById('map');
+let isD = false, lx, ly;
+const map = document.getElementById("map");
 
 window.onpointerdown = e => {
-    if (e.target.closest('#btn-food, .modal, nav, #hud, #panel, #btn-confirm')) return;
-    isDragging = true;
-    lastX = e.pageX;
-    lastY = e.pageY;
+  if (e.target.closest("#btn-food,.modal,nav,#hud,#panel,#btn-confirm")) return;
+  isD = true; lx = e.pageX; ly = e.pageY;
 };
 
 window.onpointermove = e => {
-    if (!isDragging) return;
-    const dx = e.pageX - lastX;
-    const dy = e.pageY - lastY;
+  if (!isD) return;
+  let dx = e.pageX - lx, dy = e.pageY - ly;
 
-    if (state.placing) {
-        state.placing.x += dx;
-        state.placing.y += dy;
-        render();
-    } else {
-        state.cam.x += dx;
-        state.cam.y += dy;
-        state.cam.x = Math.max(-5000, Math.min(0, state.cam.x));
-        state.cam.y = Math.max(-5000, Math.min(0, state.cam.y));
-        mapElement.style.transform = `translate(${state.cam.x}px, ${state.cam.y}px)`;
-    }
-
-    lastX = e.pageX;
-    lastY = e.pageY;
+  if (state.placing) {
+    state.placing.x += dx; state.placing.y += dy; render();
+  } else {
+    state.cam.x += dx; state.cam.y += dy;
+    state.cam.x = Math.max(-5000, Math.min(0, state.cam.x));
+    state.cam.y = Math.max(-5000, Math.min(0, state.cam.y));
+    map.style.transform = `translate(\( {state.cam.x}px, \){state.cam.y}px)`;
+  }
+  lx = e.pageX; ly = e.pageY;
 };
 
-window.onpointerup = () => isDragging = false;
+window.onpointerup = () => isD = false;
 
-// ============================================================================
-//  UTILITÁRIOS GERAIS
-// ============================================================================
-function addLog(message) {
-    const logArea = document.getElementById('log');
-    const entry = document.createElement('div');
-    entry.className = 'log-msg';
-    entry.innerText = message;
-    logArea.prepend(entry);
-    if (logArea.children.length > 5) logArea.lastChild.remove();
-    setTimeout(() => entry.remove(), 3500);
+function addLog(m) {
+  const l = document.getElementById("log");
+  const d = document.createElement("div");
+  d.className = "log-msg"; d.innerText = m;
+  l.prepend(d);
+  if (l.children.length > 5) l.lastChild.remove();
+  setTimeout(() => d.remove(), 3500);
 }
 
 function switchWorld() {
-    state.world = state.world === 'normal' ? 'ceno' : 'normal';
-    document.getElementById('v-world').innerText = state.world === 'normal' ? 'JURÁSSICO' : 'CENOZÓICO';
-    document.getElementById('map').className = 'map-' + state.world;
-    render();
-    updateHUD();
+  state.world = state.world === "normal" ? "ceno" : "normal";
+  document.getElementById("v-world").innerText = state.world === "normal" ? "JURÁSSICO" : "CENOZÓICO";
+  document.getElementById("map").className = "map-" + state.world;
+  render();
+  updateHUD();
 }
 
-function startExp(duration, cost) {
-    if (state.cash >= cost) {
-        state.cash -= cost;
-        state.expEnd = Date.now() + (duration * 1000);
-        save();
-    } else {
-        alert("Grana curta!");
-    }
+function startExp(t, c) {
+  if (state.cash >= c) {
+    state.cash -= c;
+    state.expEnd = Date.now() + (t * 1000);
+    save();
+  } else alert("Grana curta!");
 }
 
 function finishExp() {
-    state.expEnd = 0;
-    state.cenoDNA++;
-    addLog("Expedição trouxe 1 DNA Cenozóico!");
-    save();
+  state.expEnd = 0;
+  state.cenoDNA++;
+  addLog("Expedição trouxe 1 DNA Cenozóico!");
+  save();
 }
 
 function closeModals() {
-    document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
+  document.querySelectorAll(".modal").forEach(m => m.style.display = "none");
 }
 
 function closePanel() {
-    document.getElementById('panel').style.display = 'none';
-    state.selected = null;
+  document.getElementById("panel").style.display = "none";
+  state.selected = null;
 }
 
-// ============================================================================
-//  SISTEMA DE SAVE (v2)
-// ============================================================================
 function save() {
-    try {
-        localStorage.setItem('DINO_HARD_SAVEv2', JSON.stringify(state));
-    } catch (err) {
-        console.error("Erro ao salvar:", err);
-    }
+  try {
+    localStorage.setItem("DINO_HARD_SAVEv2", JSON.stringify(state));
+  } catch (e) {}
 }
 
 function load() {
-    const savedData = localStorage.getItem('DINO_HARD_SAVEv2');
-    if (savedData) {
-        try {
-            const parsed = JSON.parse(savedData);
-            state = { ...state, ...parsed };
+  let d = localStorage.getItem("DINO_HARD_SAVEv2");
+  if (d) {
+    try {
+      let parsed = JSON.parse(d);
+      state = { ...state, ...parsed };
 
-            // Proteções contra save corrompido
-            if (typeof state.cash !== 'number' || isNaN(state.cash)) state.cash = 15000;
-            if (typeof state.food !== 'number' || isNaN(state.food)) state.food = 1000;
-            if (typeof state.cenoDNA !== 'number' || isNaN(state.cenoDNA)) state.cenoDNA = 0;
-            if (!Array.isArray(state.dinos)) state.dinos = [];
-            if (!Array.isArray(state.inv)) state.inv = [];
-            if (!Array.isArray(state.discovered)) state.discovered = [];
-            if (!state.cam || typeof state.cam !== 'object') state.cam = { x: -2900, y: -2900 };
-            if (!state.world) state.world = 'normal';
+      // Proteção forte
+      state.dinos = state.dinos.filter(d => d && d.name);
+      state.inv = state.inv.filter(d => d && d.name);
 
-            // Limpa entradas inválidas
-            state.dinos = state.dinos.filter(d => d && d.name);
-            state.inv = state.inv.filter(d => d && d.name);
-        } catch (err) {
-            console.error("Save corrompido. Iniciando novo jogo.", err);
-        }
+      state.dinos.forEach(d => {
+        if (!d.name) d.name = "Dino Desconhecido";
+        if (!d.img) d.img = "?";
+        if (!d.rar) d.rar = "comum";
+        if (!d.lvl) d.lvl = 1;
+        if (typeof d.lastInc !== "number") d.lastInc = 0;
+      });
+
+      state.inv.forEach(d => {
+        if (!d.name) d.name = "Dino Desconhecido";
+        if (!d.img) d.img = "?";
+        if (!d.rar) d.rar = "comum";
+      });
+
+      if (typeof state.cash !== "number" || isNaN(state.cash)) state.cash = 15000;
+      if (typeof state.food !== "number" || isNaN(state.food)) state.food = 1000;
+      if (typeof state.cenoDNA !== "number" || isNaN(state.cenoDNA)) state.cenoDNA = 0;
+    } catch (e) {
+      console.error("Save inválido");
+      state.cash = 15000;
     }
+  }
 }
 
-// ============================================================================
-//  INICIALIZAÇÃO DO JOGO
-// ============================================================================
+// Inicializa
 load();
 setInterval(tick, 100);
 setInterval(save, 15000);
