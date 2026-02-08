@@ -481,7 +481,10 @@ function openModal(id) {
     if(id === 'inv') {
         const g = document.getElementById('inv-grid');
         g.innerHTML = '';
-        if(state.inv.length === 0) g.innerHTML = "<p style='text-align:center;color:#777'>Vazio</p>";
+        if(state.inv.length === 0) {
+            g.innerHTML = "<p style='text-align:center;color:#777'>Vazio</p>";
+            return;
+        }
         
         state.inv.forEach((d, i) => {
             let row = document.createElement('div');
@@ -727,8 +730,13 @@ function load() {
             if (!Array.isArray(state.discovered)) state.discovered = [];
             if (!state.cam || typeof state.cam !== 'object') state.cam = {x:-2900, y:-2900};
             if (!state.world) state.world = 'normal';
+
+            // Limpa dinos e itens corrompidos
+            state.dinos = state.dinos.filter(d => d && typeof d === 'object' && d.name);
+            state.inv = state.inv.filter(d => d && typeof d === 'object' && d.name);
         } catch (e) {
             console.error("Save corrompido. Iniciando novo jogo.", e);
+            // Mantém valores padrão seguros
         }
     }
 }
@@ -740,3 +748,5 @@ setInterval(save, 15000);
 render();
 map.style.transform = `translate(${state.cam.x}px, ${state.cam.y}px)`;
 </script>
+</body>
+    </html>
