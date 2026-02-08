@@ -630,9 +630,9 @@ function closeModals() { document.querySelectorAll('.modal').forEach(m => m.styl
 function closePanel() { document.getElementById('panel').style.display='none'; state.selected=null; }
 
 /* --- SAVE SYSTEM --- */
-function save() { localStorage.setItem('DINO_HARD_SAVE', JSON.stringify(state)); }
+function save() { localStorage.setItem('DINO_HARD_SAVEv2', JSON.stringify(state)); }
 function load() {
-    let d = localStorage.getItem('DINO_HARD_SAVE');
+    let d = localStorage.getItem('DINO_HARD_SAVEv2');
     if(d) {
         let l = JSON.parse(d);
         state = {...state, ...l};
